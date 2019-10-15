@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const fileUpload = require('express-fileupload');
-express.use(fileUpload());
+const app = express();
+app.use(fileUpload());
 
 var exec = require('child_process').exec,child;
 
-router.post('/upload', function(req, res, next) {
-  
+app.post('/upload', function(req, res, next) {
+
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
