@@ -4,8 +4,9 @@ cd /home/
 npm install express-fileupload
 #echo 'something'
 cd /home/P9-reviewRender
-git pull
 git reset --hard
+git pull
+
 
 # git clone "https://github.com/thinhar/P9-reviewRender.git" && cd /home/P9-reviewRender && 
 git checkout manger-Api
