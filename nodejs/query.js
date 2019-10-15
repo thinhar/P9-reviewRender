@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+var bodyParser = require("body-parser");
 
 var exec = require('child_process').exec,child;
 
 router.post('/upload', function(req, res, next) {
 
         if (err) {
+          console.log(req.files.foo.name)
             res.status(400).json({
                 error: stderr
             });

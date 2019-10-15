@@ -14,7 +14,7 @@ RUN apt-get install -y curl \
   && apt-get install -y nodejs \
   && curl -L https://www.npmjs.com/install.sh | sh
 
-RUN npm install morgan && npm install express
+RUN npm install morgan && npm install express && npm install body-parser
 
 RUN apt-get install python3.7 -y \
 	&& apt-get install python3-pip -y
