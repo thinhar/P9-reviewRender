@@ -1,6 +1,7 @@
 # make sure we have the up to date things from git, so we dont have to create a new dockerimage every time we make changes
 # since the dockerimage is static and the things on git hub is not. 
 cd /home/P9-reviewRender
+git pull
 git reset --hard
 
 # git clone "https://github.com/thinhar/P9-reviewRender.git" && cd /home/P9-reviewRender && 
