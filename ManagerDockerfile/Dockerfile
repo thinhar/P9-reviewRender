@@ -5,6 +5,7 @@ RUN apt-get update -y
 RUN apt-get install git -y
 
 WORKDIR /home/
+# move this shit to a entrypoint so i dont have to remake the image all the time
 RUN git clone "https://github.com/thinhar/P9-reviewRender.git" && cd P9-reviewRender && git checkout manger-Api
 
 
@@ -18,4 +19,10 @@ RUN npm install morgan && npm install express
 RUN apt-get install python3.7 -y \
 	&& apt-get install python3-pip -y
 
-#ENTRYPOINT ["/home/P9-reviewRender/nodejs/server.js"] # call the start lisning
+RUN chmod +x Entrypoint.sh
+
+	# testing stuff:
+RUN apt-get install nano -y
+
+
+ENTRYPOINT ["/home/P9-reviewRender/ManagerDockerfile/EntryPoint.sh", "&&", "node", "/home/P9-reviewRender/nodejs/server.js] # call the start lisning
