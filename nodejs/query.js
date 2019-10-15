@@ -1,24 +1,30 @@
 const express = require('express');
 const router = express.Router();
-var bodyParser = require("body-parser");
+
+const fileUpload = require('express-fileupload');
+express.use(fileUpload());
 
 var exec = require('child_process').exec,child;
 
 router.post('/upload', function(req, res, next) {
+  
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
 
-        if (err) {
-          console.log(req.files.foo.name)
-            res.status(400).json({
-                error: stderr
-            });
-        }
-        else {
-          output = console.log(req.files.foo.name); 
+  // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+  let sampleFile = req.files.sampleFile;
+
+  // Use the mv() method to place the file somewhere on your server
+  sampleFile.mv('/home/filename.jpg', function(err) {
+    if (err){
+      return res.status(500).send(err);
+    }else {
             res.status(200).json({
-                message:        "Result from backend",
-                output:         output
+                message: "uploaded"
             });
         }
+  });
   //console.log(req.files.foo.name); // the uploaded file object
 });
 
