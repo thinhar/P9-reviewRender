@@ -8,7 +8,7 @@ app.use(fileUpload());
 var exec = require('child_process').exec,child;
 
 router.post('/upload', function(req, res, next) {
-  echo !req.files 
+  echo (!req.files) 
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
