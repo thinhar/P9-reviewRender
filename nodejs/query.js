@@ -10,7 +10,7 @@ var exec = require('child_process').exec,child;
 router.post('/upload', function(req, res, next) {
   console.log(req);
   console.log(req.body);
-  console.log(req.body.formdata.);
+  console.log(req.body.formdata);
   console.log(req.body.formdata.justStuff);
   console.log(req.body.formdata.justStuff.name);
   if (!req.formdata || Object.keys(req.formdata).length === 0) {
