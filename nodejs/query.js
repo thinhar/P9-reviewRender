@@ -8,13 +8,13 @@ app.use(fileUpload());
 var exec = require('child_process').exec,child;
 
 router.post('/upload', function(req, res, next) {
-  console.log(!req.form-data);
-  if (!req.form-data || Object.keys(req.form-data).length === 0) {
+  console.log(!req.formdata);
+  if (!req.formdata || Object.keys(req.formdata).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
 
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-  let sampleFile = req.form-data.justStuff;
+  let sampleFile = req.formdata.justStuff;
 
   // Use the mv() method to place the file somewhere on your server
   sampleFile.mv('/home/filename.jpg', function(err) {
