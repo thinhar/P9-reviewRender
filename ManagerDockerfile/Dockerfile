@@ -4,8 +4,8 @@ RUN apt-get update -y
 
 RUN apt-get install git -y
 
-WORKDIR /home/$username
-RUN git clone "https://github.com/thinhar/P9-reviewRender.git" && cd P9-reviewRender # && git checkout branch
+WORKDIR /home/
+RUN git clone "https://github.com/thinhar/P9-reviewRender.git" && cd P9-reviewRender && git checkout manger-Api
 
 
 RUN apt-get install -y curl \
@@ -18,4 +18,4 @@ RUN npm install morgan && npm install express
 RUN apt-get install python3.7 -y \
 	&& apt-get install python3-pip -y
 
-#ENTRYPOINT ["/usr/local/blender/blender", "-b", "-noaudio"] # call the start lisning
+#ENTRYPOINT ["/home/P9-reviewRender/nodejs/server.js"] # call the start lisning
