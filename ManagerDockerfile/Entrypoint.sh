@@ -2,3 +2,6 @@
 # since the dockerimage is static and the things on git hub is not. 
 git clone "https://github.com/thinhar/P9-reviewRender.git" && cd /home/P9-reviewRender && git checkout manger-Api
 
+#chmod +x /home/P9-reviewRender/nodejs/server.js
+
+node /home/P9-reviewRender/nodejs/server.js

@@ -19,10 +19,10 @@ RUN npm install morgan && npm install express
 RUN apt-get install python3.7 -y \
 	&& apt-get install python3-pip -y
 
-RUN chmod +x Entrypoint.sh
+RUN chmod +x /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh
 
 	# testing stuff:
 RUN apt-get install nano -y
 
 
-ENTRYPOINT ["/home/P9-reviewRender/ManagerDockerfile/EntryPoint.sh", "&&", "node", "/home/P9-reviewRender/nodejs/server.js] # call the start lisning
+#ENTRYPOINT /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh # call the start lisning
