@@ -3,7 +3,7 @@ const router = express.Router();
 
 var exec = require('child_process').exec,child;
 
-app.post('/upload', function(req, res, next) {
+router.post('/upload', function(req, res, next) {
 
         if (err) {
             res.status(400).json({
