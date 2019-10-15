@@ -7,9 +7,9 @@ cd /home/P9-reviewRender
 git reset --hard
 git pull
 
-
+git log -1 --oneline
 # git clone "https://github.com/thinhar/P9-reviewRender.git" && cd /home/P9-reviewRender && 
-git checkout manger-Api
+# git checkout manger-Api
 
 #chmod +x /home/P9-reviewRender/nodejs/server.js
 chmod +x /home/P9-reviewRender/nodejs/dummyScript.sh
