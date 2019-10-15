@@ -8,7 +8,11 @@ app.use(fileUpload());
 var exec = require('child_process').exec,child;
 
 router.post('/upload', function(req, res, next) {
-  console.log(req.formdata.justStuff.name);
+  console.log(req);
+  console.log(req.body);
+  console.log(req.body.formdata.);
+  console.log(req.body.formdata.justStuff);
+  console.log(req.body.formdata.justStuff.name);
   if (!req.formdata || Object.keys(req.formdata).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
