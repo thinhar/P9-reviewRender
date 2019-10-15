@@ -2,6 +2,7 @@
 # since the dockerimage is static and the things on git hub is not. 
 cd /home/
 npm install express-bodyparser
+echo 'something'
 cd /home/P9-reviewRender
 git pull
 git reset --hard
