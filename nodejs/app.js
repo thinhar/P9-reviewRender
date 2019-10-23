@@ -15,7 +15,7 @@ app.use(fileUpload({
     createParentPath: true
 }));
 
-app.use(BodyParser.json);
+app.use(bodyParser.json);
 
 
 app.use('/query', queryRoutes);
