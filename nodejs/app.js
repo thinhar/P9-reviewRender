@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 // HTTP request logging for nodejs, useful for debugging 
 
 const queryRoutes = require('./query');
