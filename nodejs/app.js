@@ -4,6 +4,8 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const _ = require('lodash');
 // HTTP request logging for nodejs, useful for debugging 
 
 const queryRoutes = require('./query');
@@ -11,9 +13,13 @@ app.use(morgan('dev'));
 // Log information dev style
 
 // enable files upload
-app.use(fileUpload());
+app.use(fileUpload({
+    createParentPath: true
+}));
 
+app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.use('/query', queryRoutes);
