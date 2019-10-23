@@ -2,11 +2,20 @@ const express = require('express');
 // Web framework for nodejs, a layer that we use for HTTP requests 
 const app = express();
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 // HTTP request logging for nodejs, useful for debugging 
 
 const queryRoutes = require('./query');
 app.use(morgan('dev')); 
 // Log information dev style
+
+// enable files upload
+app.use(fileUpload({
+    createParentPath: true
+}));
+
+app.use(BodyParser.json);
+
 
 app.use('/query', queryRoutes);
 // All requests by name /query should be handled by queryRoutes
