@@ -13,7 +13,7 @@ app.use(morgan('dev'));
 // enable files upload
 app.use(fileUpload());
 
-app.use(bodyParser.json);
+app.use(bodyParser.json());
 
 
 app.use('/query', queryRoutes);
