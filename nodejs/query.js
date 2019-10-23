@@ -3,7 +3,37 @@ const router = express.Router();
 
 var exec = require('child_process').exec,child;
 
-router.post('/upload', function(req, res, next) {
+router.post('/upload', async (req, res) => {
+    try {
+        if(!req.files) {
+            res.send({
+                status: false,
+                message: 'No file uploaded'
+            });
+        } else {
+            //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+            let avatar = req.files.avatar;
+            
+            //Use the mv() method to place the file in upload directory (i.e. "uploads")
+            avatar.mv('./uploads/' + avatar.name);
+
+            //send response
+            res.send({
+                status: true,
+                message: 'File is uploaded',
+                data: {
+                    name: avatar.name,
+                    mimetype: avatar.mimetype,
+                    size: avatar.size
+                }
+            });
+        }
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
+router.post('/upload2', function(req, res, next) {
   console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
