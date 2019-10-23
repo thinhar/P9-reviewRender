@@ -11,9 +11,7 @@ app.use(morgan('dev'));
 // Log information dev style
 
 // enable files upload
-app.use(fileUpload({
-    createParentPath: true
-}));
+app.use(fileUpload());
 
 app.use(bodyParser.json);
 
