@@ -12,17 +12,17 @@ router.post('/uploadasync', async (req, res, next) => {
             });
         } else {
             //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-            let avatar = req.files.theFile;
+            let sampleFile = req.files.theFile;
             
             //Use the mv() method to place the file in upload directory (i.e. "uploads")
-            avatar.mv('./uploads/' + avatar.name);
+            sampleFile.mv('./uploads/' + sampleFile.name);
 
             //send response
             res.status(200).json({
                 
-                name: avatar.name,
-                mimetype: avatar.mimetype,
-                size: avatar.size,
+                name: sampleFile.name,
+                mimetype: sampleFile.mimetype,
+                size: sampleFile.size,
                 message: "uploaded"
             });
           }
@@ -48,9 +48,9 @@ router.post('/upload', function(req, res, next) {
     }else {
             res.status(200).json({
 
-                name: avatar.name,
-                mimetype: avatar.mimetype,
-                size: avatar.size,
+                name: sampleFile.name,
+                mimetype: sampleFile.mimetype,
+                size: sampleFile.size,
                 message: "uploaded"
             });
         }
