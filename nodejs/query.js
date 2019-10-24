@@ -18,16 +18,14 @@ router.post('/uploadasync', async (req, res, next) => {
             avatar.mv('./uploads/' + avatar.name);
 
             //send response
-            res.send({
-                status: true,
-                message: 'File is uploaded',
-                data: {
-                    name: avatar.name,
-                    mimetype: avatar.mimetype,
-                    size: avatar.size
-                }
+            res.status(200).json({
+                
+                name: avatar.name,
+                mimetype: avatar.mimetype,
+                size: avatar.size
+                message: "uploaded"
             });
-        }
+          }
     } catch (err) {
         res.status(500).send(err);
     }
@@ -49,6 +47,10 @@ router.post('/upload', function(req, res, next) {
         error : err});
     }else {
             res.status(200).json({
+
+                name: avatar.name,
+                mimetype: avatar.mimetype,
+                size: avatar.size
                 message: "uploaded"
             });
         }
