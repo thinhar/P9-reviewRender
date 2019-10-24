@@ -1,0 +1,4 @@
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+kubectl exec -it POD -- /bin/bash
+kubectl delete POD
+kubectl logs crf-c7485c58c-rz294 --previous
