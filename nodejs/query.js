@@ -22,7 +22,7 @@ router.post('/uploadasync', async (req, res, next) => {
                 
                 name: avatar.name,
                 mimetype: avatar.mimetype,
-                size: avatar.size
+                size: avatar.size,
                 message: "uploaded"
             });
           }
@@ -50,7 +50,7 @@ router.post('/upload', function(req, res, next) {
 
                 name: avatar.name,
                 mimetype: avatar.mimetype,
-                size: avatar.size
+                size: avatar.size,
                 message: "uploaded"
             });
         }
