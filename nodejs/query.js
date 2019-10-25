@@ -41,13 +41,12 @@ router.post('/upload', function(req, res, next) {
   let sampleFile = req.files.theFile;
 
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/home/filename.jpg', function(err) {
+  sampleFile.mv('/home/'+sampleFile.name, function(err) {
     if (err){
       return res.status(500).json({
         error : err});
     }else {
             res.status(200).json({
-
                 name: sampleFile.name,
                 mimetype: sampleFile.mimetype,
                 size: sampleFile.size,
