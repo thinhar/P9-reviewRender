@@ -1,0 +1,7 @@
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+kubectl exec -it POD -- /bin/bash
+kubectl delete POD
+kubectl logs crf-c7485c58c-rz294 --previous
+az aks get-credentials --resource-group CLUSTERRESOURCEGROUP --name CLUSTERNAME
+kubectl apply -f PATHTOREPOSITORY\P7-DimensionalShopping\Backend\Kubernetes\dime
+https://attacomsian.com/blog/uploading-files-nodejs-express
