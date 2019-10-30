@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: intercontainer-shared-files
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 1Gi

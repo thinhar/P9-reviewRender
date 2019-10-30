@@ -1,7 +1,5 @@
 FROM ubuntu:18.04
 
-LABEL authors="Isaac (Ike) Arias <ikester@gmail.com>"
-
 RUN apt-get update && \
 	apt-get install -y \
 		curl \
@@ -10,7 +8,12 @@ RUN apt-get update && \
 		libgl1-mesa-dev \
 		libglu1-mesa \
 		libxi6 \
-		libxrender1 && \
+		libxrender1 \
+		curl \
+		ca-certificates \
+		amqp-tools \
+		python \
+		dnsutils && \
 	apt-get -y autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
@@ -23,6 +26,8 @@ RUN mkdir /usr/local/blender && \
 	tar -jxvf blender.tar.bz2 -C /usr/local/blender --strip-components=1 && \
 	rm blender.tar.bz2
 
-VOLUME /media
+#VOLUME /media
 
-ENTRYPOINT ["/usr/local/blender/blender", "-b", "-noaudio"]
+#CMD /bin/bash/
+CMD /usr/bin/amqp-consume --url=$BROKER_URL -q $QUEUE -c 1 cat | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio {}"
+
