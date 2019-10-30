@@ -35,7 +35,7 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-          - mountPath: "/home"
+          - mountPath: "/home/shared"
             name: volume
       volumes:
         - name: volume
