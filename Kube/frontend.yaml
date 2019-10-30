@@ -34,4 +34,10 @@ spec:
         image: thinhar/cloudrender-api:1.0
         ports:
         - containerPort: 80
-
+        volumeMounts:
+          - mountPath: "/home"
+            name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: intercontainer-shared-files
