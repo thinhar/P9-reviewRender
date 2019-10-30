@@ -13,7 +13,7 @@ router.post('/uploadasync', async (req, res, next) => {
   let sampleFile = req.files.theFile;
 
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/home/'+sampleFile.name, function(err) {
+  sampleFile.mv('/home/shared/'+sampleFile.name, function(err) {
     if (err){
       return res.status(500).json({
         error : err});
@@ -39,7 +39,7 @@ router.post('/upload', function(req, res, next) {
   let sampleFile = req.files.theFile;
 
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/home/'+sampleFile.name, function(err) {
+  sampleFile.mv('/home/shared/'+sampleFile.name, function(err) {
     if (err){
       return res.status(500).json({
         error : err});
