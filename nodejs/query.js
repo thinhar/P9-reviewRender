@@ -30,28 +30,42 @@ router.post('/uploadasync', async (req, res, next) => {
 });
 
 router.post('/upload', function(req, res, next) {
+
+
   //console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
 
+
+
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
+  exec("/usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
+    if(err) {
+        res.status(400).json({
+            error: stderr
+        });
+    }
+    else {
+      sampleFile.mv('/home/shared/'+sampleFile.name, function(err2) {
+        if (err2){
+          return res.status(500).json({
+            error : err2});
+        }else {
+          res.status(200).json({
+              name: sampleFile.name,
+              mimetype: sampleFile.mimetype,
+              size: sampleFile.size,
+              message: "uploaded"
+          });
+        }
+      });
+    }
+  });
 
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/home/shared/'+sampleFile.name, function(err) {
-    if (err){
-      return res.status(500).json({
-        error : err});
-    }else {
-            res.status(200).json({
-                name: sampleFile.name,
-                mimetype: sampleFile.mimetype,
-                size: sampleFile.size,
-                message: "uploaded"
-            });
-        }
-  });
+  
   //console.log(req.files.foo.name); // the uploaded file object
 });
 
