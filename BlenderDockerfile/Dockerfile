@@ -29,5 +29,5 @@ RUN mkdir /usr/local/blender && \
 #VOLUME /media
 
 #CMD /bin/bash/
-CMD /usr/bin/amqp-consume --url=$BROKER_URL -q $QUEUE -c 1 cat | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio {}"
+CMD /usr/bin/amqp-consume --url=$BROKER_URL -q $QUEUE -c 1 cat | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio /home/shared/{} -o /media/frame_### -f 1"
 
