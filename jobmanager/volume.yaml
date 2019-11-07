@@ -40,7 +40,7 @@ parameters:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: shared-volume3
+  name: shared-volume
 spec:
   accessModes:
     - ReadWriteMany
