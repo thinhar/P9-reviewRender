@@ -1,0 +1,48 @@
+# Frontend load balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: crf-service
+spec: # Specify data about which pods the service should enable inter-cluster-comunication for
+  type: LoadBalancer 
+  ports: # Which port communication will go through
+  - port: 80 # HTTP Default 
+  selector: # Defines the target label of the pods that the service should function as a load balancer for
+    app: cr-frontend
+
+---
+
+# Frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crf # Cloud Render Frontend
+  labels:
+    app: cr-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cr-frontend
+  template:
+    metadata:
+      labels:
+        app: cr-frontend
+    spec:
+      containers:
+      - name: crf-i
+        image: thinhar/cloudrender-api:1.1
+        ports:
+        - containerPort: 80
+        env: # Environment variables for the session, useful for debugging. Source: https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/
+        - name: BROKER_URL
+          value: amqp://guest:guest@rabbitmq-service:5672
+        - name: QUEUE
+          value: foo3
+        volumeMounts:
+          - mountPath: "/home/shared"
+            name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: shared-volume
