@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: crf-i
-        image: thinhar/cloudrender-api:1.1
+        image: thinhar/cloudrender-api:1.11
         ports:
         - containerPort: 80
         env: # Environment variables for the session, useful for debugging. Source: https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/

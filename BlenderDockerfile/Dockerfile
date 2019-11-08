@@ -29,6 +29,7 @@ RUN mkdir /usr/local/blender && \
 COPY ./renderscript /home/script
 RUN chmod +x /home/script/renderscript.sh
 
+#CMD /bin/bash
 CMD /home/script/renderscript.sh
 
 #CMD while /usr/bin/amqp-get --url=amqp://guest:guest@rabbitmq-service:5672 -q workqueue | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio /home/shared/{} -o /home/shared/frame_### -f 1"; do :; done 
