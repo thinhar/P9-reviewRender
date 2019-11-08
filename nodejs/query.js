@@ -34,14 +34,17 @@ router.post('/upload', function(req, res, next) {
 
   //console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
+    return res.status(400).send('No file was uploaded.');
   }
 
 
 
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
-  exec("/usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
+  exec(
+    "/usr/bin/amqp-declare-queue --url=$BROKER_URL -q "+sampleFile.name+" && \
+     /usr/bin/amqp-publish --url=$BROKER_URL -r "+sampleFile.name+" -p -b \""+sampleFile.name +" -f 1\"  && \ 
+     /usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
     if(err) {
         res.status(400).json({
             error: stderr
