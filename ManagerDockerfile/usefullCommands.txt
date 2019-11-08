@@ -1,1 +1,2 @@
 docker container stop $(docker container ls -aq)
+docker run --rm IMAGE 

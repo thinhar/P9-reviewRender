@@ -35,4 +35,4 @@ RUN chmod +x /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh
 #RUN apt-get install nano -y
 
 
-ENTRYPOINT /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh # calls the start lisning
+ENTRYPOINT /usr/bin/amqp-declare-queue --url=$BROKER_URL -q $QUEUE -d && /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh # call the start lisning
