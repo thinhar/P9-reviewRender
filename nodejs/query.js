@@ -50,7 +50,7 @@ router.post('/upload', function(req, res, next) {
         });
     }
     else {
-      exec("curl --request GET ${analyzerService}/"+sampleFile.name+" ", function(err2, stdout2, stderr2) {
+      exec("curl --request GET ${analyzerService}/sampleFilename", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
             error : stderr2});
