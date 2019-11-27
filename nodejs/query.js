@@ -29,29 +29,30 @@ router.post('/uploadasync', async (req, res, next) => {
 
 });
 
+//exec("/usr/bin/amqp-declare-queue --url=$BROKER_URL -q "+sampleFile.name+" && /usr/bin/amqp-publish --url=$BROKER_URL -r "+sampleFile.name+" -p -b \""+sampleFile.name +" -f 1\"  && /usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
+ 
+
 router.post('/upload', function(req, res, next) {
-
-
   //console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No file was uploaded.');
   }
 
-
+  var analyzerService-ip = process.env.ANALYZER_SERVICE_PORT;
 
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
-  exec("/usr/bin/amqp-declare-queue --url=$BROKER_URL -q "+sampleFile.name+" && /usr/bin/amqp-publish --url=$BROKER_URL -r "+sampleFile.name+" -p -b \""+sampleFile.name +" -f 1\"  && /usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
+  sampleFile.mv('/home/shared/'+sampleFile.name, function(err, stdout, stderr) {
     if(err) {
         res.status(400).json({
             error: stderr
         });
     }
     else {
-      sampleFile.mv('/home/shared/'+sampleFile.name, function(err2) {
+      exec("curl --request GET ${analyzerService}/"+sampleFile.name+" ", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
-            error : err2});
+            error : stderr2});
         }else {
           res.status(200).json({
               name: sampleFile.name,
