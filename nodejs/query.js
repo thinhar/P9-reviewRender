@@ -38,10 +38,11 @@ router.post('/upload', function(req, res, next) {
     return res.status(400).send('No file was uploaded.');
   }
 
-  var analyzerService_ip = process.env.ANALYZER_SERVICE_PORT;
-
+  let analyzerService_ip = process.env.ANALYZER_SERVICE_PORT;
+  
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
+  console.log(analyzerService_ip+" "+sampleFile.name);
   sampleFile.mv('/home/shared/'+sampleFile.name, function(err, stdout, stderr) {
     if(err) {
         res.status(400).json({
