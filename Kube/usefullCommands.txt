@@ -2,6 +2,44 @@ https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 kubectl exec -it POD -- /bin/bash
 kubectl delete POD
 kubectl logs crf-c7485c58c-rz294 --previous
-az aks get-credentials --resource-group CLUSTERRESOURCEGROUP --name CLUSTERNAME
+az aks get-credentials --resource-group cloudrender-rg --name cloudrender005
 kubectl apply -f PATHTOREPOSITORY\P7-DimensionalShopping\Backend\Kubernetes\dime
+az aks delete --resource-group cloudrender-rg --name cloudrender005 --no-wait
+kubectl run -i --tty temp --image thinhar/blenderworker:1.21
+kubectl describe pvc PERSISTANTVOLUMEVCLAIM
+
 https://attacomsian.com/blog/uploading-files-nodejs-express
+
+remember:
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
+az provider register --namespace Microsoft.Storage
+
+
+https://manpages.debian.org/unstable/amqp-tools/index.html
+to be run once at startup
+export BROKER_URL=amqp://guest:guest@rabbitmq-service:5672 //somehow make BROKER_URL an env variable for the workers and the ones who publish tasks 
+/usr/bin/amqp-declare-queue --url=amqp://guest:guest@rabbitmq-service:5672 -q foo3 -d //somehow make NAME an env variable for the workers and the ones who publish tasks 
+
+to be run when task is created (multiple times)
+/usr/bin/amqp-publish --url=$BROKER_URL -r foo -p -b Hello
+/usr/bin/amqp-consume --url=$BROKER_URL -q foo -c 1
+
+
+
+create pod:
+KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+curl -k \
+    -X POST \
+    -d @- \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'
+
+get all pods
+curl -k \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods
+
+KUBERNETES_SERVICE_HOST and KUBERNETES_PORT_443_TCP_PORT are prexsisting env varriables

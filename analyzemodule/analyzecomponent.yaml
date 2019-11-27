@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bwb-service
+  name: analyzer-service
 spec:
   type: LoadBalancer  
   ports:
   - port: 80
   selector:
-    app: bw-backend
+    app: analyzer
 
 ---
 
@@ -15,22 +15,22 @@ spec:
 apiVersion: apps/v1 # This is fucked up: https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-apiversion-definition-guide.html
 kind: Deployment # Define what should be made deployment or service. Deployments define the actual pods where services are used for comuncation to the pod 
 metadata:
-  name: bw 
+  name: analyzerpod 
   labels: # Label used by the pod template to find what deplyment they are.
-    app: bw-backend
+    app: analyzer
 spec:
   replicas: 1 # How many pods should coexist
   selector: # Defines what pods the deplyment should manage
     matchLabels: # Select the label of the pods that the deployment should manage
-      app: bw-backend
+      app: analyzer
   template: # Define the template of a pod
     metadata: # Define the metadata of the template pod
       labels: # Define label of template pod
-        app: bw-backend
+        app: analyzer
     spec: # Define the template to build on: useually a docker image
       containers: 
-      - name: blenderworker-i # Give the container a name
-        image: thinhar/blenderworker:1.491 # Which docker image it should be based on
+      - name: analyzer-i # Give the container a name
+        image: thinhar/analyzer:0.01 # Which docker image it should be based on
         ports: # Open ports in the containers (this basically just adds an option to the docker run command)
         - containerPort: 80 # Same port as its corresponding load balancer
         # To override the docker entrypoint and keeping the container alive to debug it manually write the commands below:
