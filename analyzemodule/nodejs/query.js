@@ -23,7 +23,11 @@ router.get('/pig', (req, res, next) => {
 });
 
 router.get('/:NAME', (req, res, next) => {
+  
   const taskname = req.params.NAME;
+
+  console.log(taskname);
+  
     exec('/home/nodejs/analyzer.sh ${taskname}', function(err, stdout, stderr) {
        	if(err) {
             res.status(400).json({
