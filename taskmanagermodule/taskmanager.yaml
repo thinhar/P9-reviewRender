@@ -19,7 +19,6 @@ metadata:
   labels: # Label used by the pod template to find what deplyment they are.
     app: analyzer
 spec:
-
   replicas: 1 # How many pods should coexist
   selector: # Defines what pods the deplyment should manage
     matchLabels: # Select the label of the pods that the deployment should manage
@@ -31,7 +30,7 @@ spec:
     spec: # Define the template to build on: useually a docker image
       containers: 
       - name: analyzer-i # Give the container a name
-        image: thinhar/analyzer:0.24 # Which docker image it should be based on
+        image: thinhar/analyzer:0.095 # Which docker image it should be based on
         ports: # Open ports in the containers (this basically just adds an option to the docker run command)
         - containerPort: 80 # Same port as its corresponding load balancer
         # To override the docker entrypoint and keeping the container alive to debug it manually write the commands below:
@@ -61,5 +60,3 @@ spec:
         - name: volume
           persistentVolumeClaim:
             claimName: shared-volume
-      serviceAccount: pod-creation-sa
-      serviceAccountName: pod-creation-sa

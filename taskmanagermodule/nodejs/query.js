@@ -22,14 +22,13 @@ router.get('/pig', (req, res, next) => {
     });
 });
 
-
 router.get('/:NAME', (req, res, next) => {
 
-  const taskName = req.params.NAME;
+  const taskname = req.params.NAME;
 
-  console.log(taskName+" nr2 "+ taskName);
+  console.log(taskname);
   
-    exec('/home/nodejs/analyzer.sh '+taskName+'', function(err, stdout, stderr) {
+    exec('/home/nodejs/analyzer.sh ${taskname}', function(err, stdout, stderr) {
        	if(err) {
           console.log(stderr);
           res.status(400).json({
@@ -42,7 +41,7 @@ router.get('/:NAME', (req, res, next) => {
 
        	  output = stdout;
           res.status(200).json({
-            task: taskName,
+            task: taskname,
             message: "succesfully analyzed and started task manager",
           });
        	}

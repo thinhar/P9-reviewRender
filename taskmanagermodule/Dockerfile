@@ -47,5 +47,5 @@ COPY ./nodejs /home/nodejs
 # testing stuff:
 #RUN apt-get install nano -y
 
-ENTRYPOINT KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) && python3 /home/nodejs/declareTaskQueue.py && node /home/nodejs/server.js
+ENTRYPOINT python3 /home/nodejs/declareFramequeueAndEnqueueFramesForTask.py && node /home/nodejs/server.js
 #ENTRYPOINT /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh # calls the start lisning
