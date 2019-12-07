@@ -36,6 +36,24 @@ curl -k \
     -H 'Content-Type: application/json' \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'
 
+curl -k \
+    -X POST \
+    -d @- \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  ...
+}
+EOF
+
+curl -k -v -X POST -H "Authorization: Bearer $KUBE_TOKEN" -H "Content-Type: application/json" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/default/pods -d@nginx-pod.json
+
+
+
 get all pods
 curl -k \
     -H "Authorization: Bearer $KUBE_TOKEN" \
@@ -43,3 +61,27 @@ curl -k \
     https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods
 
 KUBERNETES_SERVICE_HOST and KUBERNETES_PORT_443_TCP_PORT are prexsisting env varriables
+
+
+
+
+
+
+
+
+
+figure out who creates:
+tasklist (unnessisarry queue, cant find origin)
+
+
+
+kube yaml file dependencies:
+no dependencies:
+volume
+worker_creator_role
+dependentcies order(including the ones previusly mentioned:
+queue
+analyzer
+frontend
+spawner
+
