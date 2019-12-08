@@ -10,7 +10,7 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbit))
 channel = connection.channel()
 
 
-args = {"x-max-priority": 10}
+args = {"x-max-priority": 3}
 queueName= 'pri-queue'
 
 
