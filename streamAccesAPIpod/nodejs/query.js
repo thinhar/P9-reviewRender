@@ -34,6 +34,15 @@ router.get('/stream/:STREAMNAME', (req, res, next) => {
   res.status(200).send(htmlReturnText);
 
 });
+router.get('/stream/:STREAMNAME/data', (req, res, next) => {
+
+  const streamName = req.params.STREAMNAME;
+
+  res.setHeader("content-type", "some/type");
+  fs.createReadStream("/home/shared/"+streamName+"output.webm").pipe(res);
+
+});
+
 
 
 module.exports = router;

@@ -1,7 +1,7 @@
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 kubectl exec -it POD -- /bin/bash
 kubectl delete POD
-kubectl logs crf-c7485c58c-rz294 --previous
+kubectl logs crf-c7485c58c-rz294 -p
 az aks get-credentials --resource-group cloudrender-rg --name cloudrender005
 kubectl apply -f PATHTOREPOSITORY\P7-DimensionalShopping\Backend\Kubernetes\dime
 az aks delete --resource-group cloudrender-rg --name cloudrender005 --no-wait
@@ -75,13 +75,26 @@ tasklist (unnessisarry queue, cant find origin)
 
 
 
+note(pods that are dependent on the queue might be unable to establish a connection initially(when the queue just has started) but will after a restart or a bit of time)
+
 kube yaml file dependencies:
 no dependencies:
+queue
 volume
 worker_creator_role
-dependentcies order(including the ones previusly mentioned:
-queue
-analyzer
-frontend
 spawner
 
+
+dependentcies order(including the ones without dependencies mentioned):
+analyzer (volume worker_creator_role queue)
+frontend (volume analyzer)
+streamAccesApipod (volume )
+
+(spawned by analyzer and spawner)
+taskmanager (queue)
+backend (volume queue)
+
+
+10 frame
+5 pods
+C requirement 1000

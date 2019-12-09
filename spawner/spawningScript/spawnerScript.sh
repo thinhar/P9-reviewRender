@@ -17,8 +17,8 @@ do
         CPURequirements="${BASH_REMATCH[2]}"
 #        echo "${taskName}"    # cncatenate strings
 #        echo "${resourceRequirements}"
-		podname="something"$i""
-		image="thinhar/blenderworker:1.54"
+		podname="renderworker"$i""
+		image="thinhar/blenderworker:1.56"
 
 		$(printf "%s" "{\"apiVersion\": \"v1\",\"kind\": \"Pod\",\"metadata\": { \"name\": \""$podname"\"},\"spec\": { \"containers\": [ {\"name\": \""$podname"\",\"image\": \""$image"\", \"resources\": { \"limits\":{\"cpu\": \""${CPURequirements}"m\"},\"requests\":{\"cpu\": \""${CPURequirements}"m\"}}, \"env\":  [{\"name\": \"BROKER_URL\",\"value\": \"amqp://guest:guest@rabbitmq-service:5672\"},{\"name\": \"QUEUE\",\"value\": \""$queueName"\"},{\"name\": \"MY_POD_NAME\",\"valueFrom\":{\"fieldRef\":{\"fieldPath\": \"metadata.name\"}}}],\"volumeMounts\": [{\"mountPath\": \"/home/shared\",\"name\": \"volume\"}], \"ports\": [{\"containerPort\": 80}] }],\"volumes\":[{\"name\": \"volume\",\"persistentVolumeClaim\":{\"claimName\": \"shared-volume\"}}],\"serviceAccount\": \"pod-creation-sa\",\"serviceAccountName\": \"pod-creation-sa\"}}" > scriptprintf)
 	

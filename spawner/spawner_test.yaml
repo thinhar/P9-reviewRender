@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: thinhar/dimentional-shopping-backend:spawner009
+  - image: thinhar/dimentional-shopping-backend:spawner012
     name: spawner
     tty: true
     env: # Environment variables for the session, useful for debugging. Source: https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/
