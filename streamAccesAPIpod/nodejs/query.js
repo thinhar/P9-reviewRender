@@ -36,12 +36,24 @@ router.get('/stream/:STREAMNAME', (req, res, next) => {
 
 });
 
-router.get('/stream/:STREAMNAME/data', (req, res, next) => {
+router.get('/stream/:STREAMNAME/currentdata', (req, res, next) => {
+    const streamName = req.params.STREAMNAME;
 
-  const streamName = req.params.STREAMNAME;
+      exec("cat /home/shared/"+streamName+"/currentFinalfile", function(err, stdout, stderr) {
+        if (err) {
+            res.status(400).json({
+                error: stderr
+            });
+        }
+        else {
+            outputfilename=stdout;
+            res.setHeader("content-type", "video/webm");
+            fs.createReadStream("/home/shared/"+streamName+"/"+outputfilename+"").pipe(res);
+        }
+      });
 
-  res.setHeader("content-type", "video/webm");
-  fs.createReadStream("/home/shared/"+streamName+"/output.webm").pipe(res);
+
+
 
 });
 

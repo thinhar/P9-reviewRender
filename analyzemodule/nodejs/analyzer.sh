@@ -9,7 +9,7 @@ numberOfPodsRequired=2
 resourceRequirements="C1000"
 
 
-image="thinhar/taskmanager:0.08"
+image=$TASKMANAGERIMAGE
 regex="([\.a-zA-Z0-9\-]+).blend"
 if [[ ${incomingname} =~ $regex ]]
 then
@@ -23,7 +23,7 @@ $(printf "%s" "{\"apiVersion\": \"v1\",\"kind\": \"Pod\",\"metadata\": { \"name\
 
 $(curl -k POST -H "Authorization: Bearer $KUBE_TOKEN" -H "Content-Type: application/json" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/default/pods -d@scriptprintf >>/home/enqueueStdout)
 
-image="thinhar/encoder:0.34"
+image=$ENCODERIMAGE
 resolution="1920x1080"
 framerate="24"
 startframe="0"
