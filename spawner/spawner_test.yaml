@@ -13,5 +13,7 @@ spec:
       value: amqp://guest:guest@rabbitmq-service:5672
     - name: QUEUE
       value: taskQueue
+    - name: WORKERIMAGE
+      value: thinhar/blenderworker:1.56
   serviceAccount: pod-creation-sa
   serviceAccountName: pod-creation-sa
