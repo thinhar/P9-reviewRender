@@ -5,7 +5,7 @@ incomingname=$1
 echo $incomingname > /home/enqueueStdout 
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 echo $KUBE_TOKEN >> /home/enqueueStdout
-numberOfPodsRequired=2
+numberOfPodsRequired=1
 resourceRequirements="C1000"
 
 
