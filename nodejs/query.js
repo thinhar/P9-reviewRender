@@ -42,7 +42,9 @@ router.post('/upload', function(req, res, next) {
   
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
+  
   console.log(analyzerService_ip+" "+sampleFile.name);
+
   sampleFile.mv('/home/shared/'+sampleFile.name, function(err, stdout, stderr) {
     if(err) {
         res.status(400).json({
@@ -50,8 +52,9 @@ router.post('/upload', function(req, res, next) {
         });
     }
     else {
+      folderName = sampleFile.name.slice(0, -6);
 
-      exec("curl --request GET "+analyzerService_ip+":80/query/"+sampleFile.name+ " ", function(err2, stdout2, stderr2) {
+      exec("mkdir -p /home/shared/"+folderName+" && date --utc +%FT%T.%3NZ > /home/shared/"+folderName+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+ sampleFile.name+ " ", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
             error : stderr2});
