@@ -79,22 +79,23 @@ note(pods that are dependent on the queue might be unable to establish a connect
 
 kube yaml file dependencies:
 no dependencies:
-queue
+queue (takes a while to startup and needs to be done starting up to avoid restarts for dependent components)
 volume
 worker_creator_role
-spawner
 
 
-dependentcies order(including the ones without dependencies mentioned):
+
+dependentcies:
 analyzer (volume worker_creator_role queue)
 frontend (volume analyzer)
 streamAccesApipod (volume )
+spawner(worker_creator_role + inherits dependencies from children: volume queue)
 
 (spawned by analyzer and spawner)
-taskmanager (queue)
-backend (volume queue)
+taskmanager (queue) ( analyzer )
+backend (volume queue) (spawner)
 
 
-10 frame
-5 pods
-C requirement 1000
+24 frame
+2 pods
+CPU requirement 1000m
