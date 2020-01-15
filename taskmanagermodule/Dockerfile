@@ -14,6 +14,7 @@ RUN apt-get update && \
 		amqp-tools \
 		python3 \
 		python3-pip \
+		nodejs \
 		dnsutils && \
 	apt-get -y autoremove && \
 	rm -rf /var/lib/apt/lists/*
@@ -31,18 +32,20 @@ RUN mkdir /usr/local/blender && \
 	tar -jxvf blender.tar.bz2 -C /usr/local/blender --strip-components=1 && \
 	rm blender.tar.bz2
 
-COPY ./renderscript /home/script
-RUN chmod +x /home/script/renderscript.sh
+WORKDIR /home/
+
+RUN  curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
+	 curl -L https://www.npmjs.com/install.sh | sh 
 
 
 
-CMD /home/script/renderscript.sh
+RUN npm install morgan && npm install express && npm install body-parser
 
+#RUN chmod +x /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh
 
+COPY ./nodejs /home/nodejs
+# testing stuff:
+#RUN apt-get install nano -y
 
-
-
-
-#CMD while /usr/bin/amqp-get --url=amqp://guest:guest@rabbitmq-service:5672 -q workqueue | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio /home/shared/{} -o /home/shared/frame_### -f 1"; do :; done 
-
-# CMD /usr/bin/amqp-consume --url=$BROKER_URL -q $QUEUE -c 1 cat | xargs -I {} sh -c "/usr/local/blender/blender -b -noaudio /home/shared/{} -o /home/shared/frame_### -f 1"
+ENTRYPOINT python3 /home/nodejs/declareFramequeueAndEnqueueFramesForTask.py && node /home/nodejs/server.js
+#ENTRYPOINT /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh # calls the start lisning

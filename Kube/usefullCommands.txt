@@ -1,7 +1,103 @@
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 kubectl exec -it POD -- /bin/bash
 kubectl delete POD
-kubectl logs crf-c7485c58c-rz294 --previous
-az aks get-credentials --resource-group CLUSTERRESOURCEGROUP --name CLUSTERNAME
+kubectl logs crf-c7485c58c-rz294 -p
+az aks get-credentials --resource-group cloudrender-rg --name cloudrender005
 kubectl apply -f PATHTOREPOSITORY\P7-DimensionalShopping\Backend\Kubernetes\dime
+az aks delete --resource-group cloudrender-rg --name cloudrender005 --no-wait
+kubectl run -i --tty temp --image thinhar/blenderworker:1.21
+kubectl describe pvc PERSISTANTVOLUMEVCLAIM
+
 https://attacomsian.com/blog/uploading-files-nodejs-express
+
+remember:
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
+az provider register --namespace Microsoft.Storage
++++++
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta/nvidia-device-plugin.yml
+
+
+https://manpages.debian.org/unstable/amqp-tools/index.html
+to be run once at startup
+export BROKER_URL=amqp://guest:guest@rabbitmq-service:5672 //somehow make BROKER_URL an env variable for the workers and the ones who publish tasks 
+/usr/bin/amqp-declare-queue --url=amqp://guest:guest@rabbitmq-service:5672 -q foo3 -d //somehow make NAME an env variable for the workers and the ones who publish tasks 
+
+to be run when task is created (multiple times)
+/usr/bin/amqp-publish --url=$BROKER_URL -r foo -p -b Hello
+/usr/bin/amqp-consume --url=$BROKER_URL -q foo -c 1
+
+
+
+create pod:
+KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+curl -k \
+    -X POST \
+    -d @- \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'
+
+curl -k \
+    -X POST \
+    -d @- \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  ...
+}
+EOF
+
+curl -k -v -X POST -H "Authorization: Bearer $KUBE_TOKEN" -H "Content-Type: application/json" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/default/pods -d@nginx-pod.json
+
+
+
+get all pods
+curl -k \
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    -H 'Accept: application/json' \
+    https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods
+
+KUBERNETES_SERVICE_HOST and KUBERNETES_PORT_443_TCP_PORT are prexsisting env varriables
+
+
+
+
+
+
+
+
+
+figure out who creates:
+tasklist (unnessisarry queue, cant find origin)
+
+
+
+note(pods that are dependent on the queue might be unable to establish a connection initially(when the queue just has started) but will after a restart or a bit of time)
+
+kube yaml file dependencies:
+no dependencies:
+queue (takes a while to startup and needs to be done starting up to avoid restarts for dependent components)
+volume
+worker_creator_role
+
+
+
+dependentcies:
+analyzer (volume worker_creator_role queue)
+frontend (volume analyzer)
+streamAccesApipod (volume )
+spawner(worker_creator_role + inherits dependencies from children: volume queue)
+
+(spawned by analyzer and spawner)
+taskmanager (queue) ( analyzer )
+backend (volume queue) (spawner)
+
+
+24 frame
+2 pods
+CPU requirement 1000m

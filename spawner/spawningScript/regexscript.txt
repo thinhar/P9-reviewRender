@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "$1"
+#|grep -P '(?:[a-zA-z1-9-]+ C)([\d]+)' -o
+
+regex="([\.a-zA-Z\-]+) C([0-9]+)"
+if [[ $1 =~ $regex ]]
+    then
+        taskName="${BASH_REMATCH[1]}"
+        resourceRequirements="${BASH_REMATCH[2]}"
+        echo "${taskName}"    # cncatenate strings
+        echo "${resourceRequirements}"
+    else
+        echo "$1 doesn't match" # this could get noisy if there are a lot of non-matching files
+fi
+
