@@ -1,22 +1,49 @@
 #!/bin/bash
 incomingname=$1
-
-#some analysis
+#some logging for testing
 echo $incomingname > /home/enqueueStdout 
+
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 echo $KUBE_TOKEN >> /home/enqueueStdout
-numberOfPodsRequired=2
-resourceRequirements="C1000"
 
-
-image=$TASKMANAGERIMAGE
+#some analysis
 regex="([\.a-zA-Z0-9\-]+).blend"
 if [[ ${incomingname} =~ $regex ]]
 then
     podname="${BASH_REMATCH[1]}"
-	echo ${podname}
+	#echo ${podname}
 
 fi
+
+############################ shitty analysis change duo task
+if [ ! -f /home/somefile ]; then
+     printf "%s" "C1000"> /home/somefile
+fi
+
+resourceRequirements=$(</home/somefile)
+if [[ ${resourceRequirements} == "C1000" ]]
+then
+        printf "%s" "C500"> /home/somefile
+else
+        printf "%s" "C1000"> /home/somefile
+fi
+############################## shitty analysis change duo task
+
+# /usr/local/blender/blender -b -noaudio /home/shared/$incomingname --python /home/nodejs/analyzer.sh '"/home/shared/"$incomingname'
+# FrameEstimateSec=$(</home/shared/$(podname)/somefile)
+# FPS=1
+# x = (FrameEstimateSec / vCPUanalyser) / (1/FPS) 
+# x = number of vcpus
+
+# REM Read from file, produced by analyser script
+
+numberOfPodsRequired=1
+
+#resourceRequirements=$(</home/shared/$(podname)/somefile)
+
+
+image=$TASKMANAGERIMAGE
+
 
 
 $(printf "%s" "{\"apiVersion\": \"v1\",\"kind\": \"Pod\",\"metadata\": { \"name\": \""$podname"\"},\"spec\": { \"containers\": [ {\"name\": \""$podname"\",\"image\": \""$image"\", \"resources\": { \"limits\":{\"cpu\": \"100m\"},\"requests\":{\"cpu\": \"50m\"}}, \"env\":  [{\"name\": \"BROKER_URL\",\"value\": \"amqp://guest:guest@rabbitmq-service:5672\"},{\"name\": \"QUEUE\",\"value\": \"tasklist\"},{\"name\": \"MY_POD_NAME\",\"valueFrom\":{\"fieldRef\":{\"fieldPath\": \"metadata.name\"}}}],\"volumeMounts\": [{\"mountPath\": \"/home/shared\",\"name\": \"volume\"}], \"ports\": [{\"containerPort\": 80}] }],\"volumes\":[{\"name\": \"volume\",\"persistentVolumeClaim\":{\"claimName\": \"shared-volume\"}}],\"serviceAccount\": \"pod-creation-sa\",\"serviceAccountName\": \"pod-creation-sa\"}}" > scriptprintf)

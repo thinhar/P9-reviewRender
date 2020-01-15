@@ -18,6 +18,14 @@ do
 framenumber=$(/usr/bin/amqp-get --url=$BROKER_URL -q $QUEUE)
 status=$?
 echo "status: $status"
+hello=1
 #  status=$(( $x + 2 ))
 done
-exit 0
+
+if [[ ${hello} == 1 ]]
+then
+	exit 0
+	else
+	exit 1
+fi
+
