@@ -20,18 +20,18 @@ Delete the cluster with command: "az aks delete --resource-group CLUSTERRESOURCE
 To enable the use of azure volumes for your account use the following link or the command following the link.
 https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
 az provider register --namespace Microsoft.Storage
-## dependencies
-yaml files with no dependencies:
-queue (takes a while(7-9 min on small clusters) to startup and needs to be done starting up to avoid restarts for dependent components)
-volume
-worker_creator_role
+## Dependencies
+yaml files with no dependencies:\
+queue (takes a while(7-9 min on small clusters) to startup and needs to be done starting up to avoid restarts for dependent components)\
+volume\
+worker_creator_role\
 
-yaml files with dependentcies:
-analyzer (volume worker_creator_role queue)
-frontend (volume analyzer)
-streamAccesApipod (volume )
-spawner(worker_creator_role + inherits dependencies from children: volume queue)
+yaml files with dependentcies:\
+analyzer (volume worker_creator_role queue)\
+frontend (volume analyzer)\
+streamAccesApipod (volume )\
+spawner(worker_creator_role + inherits dependencies from children: volume queue)\
 
-kuberntes pods spawned by analyzer and spawner
-taskmanager (queue analyzer )
-backend (volume queue spawner)
+kuberntes pods spawned by analyzer and spawner\
+taskmanager (queue analyzer )\
+backend (volume queue spawner)\
