@@ -76,6 +76,26 @@ router.post('/upload', function(req, res, next) {
   
   //console.log(req.files.foo.name); // the uploaded file object
 });
+router.get('/stream/:STREAMNAME/currentdata', (req, res, next) => {
+    const streamName = req.params.STREAMNAME;
+
+      exec("cat /home/shared/"+streamName+"/currentFinalfile", function(err, stdout, stderr) {
+        if (err) {
+            res.status(400).json({
+                error: stderr
+            });
+        }
+        else {
+            outputfilename=stdout;
+            res.setHeader("content-type", "video/webm");
+            fs.createReadStream("/home/shared/"+streamName+"/"+outputfilename+"").pipe(res);
+        }
+      });
+
+
+
+
+});
 
 router.get('/', (req, res, next) => {
     exec('date', function(err, stdout, stderr) {
