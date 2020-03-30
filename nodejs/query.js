@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const uuidv4 = require("uuid/v4")
+
 
 var exec = require('child_process').exec,child;
 
@@ -42,19 +44,18 @@ router.post('/upload', function(req, res, next) {
   
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.theFile;
-  
-  console.log(analyzerService_ip+" "+sampleFile.name);
+  taskname=uuidv4();
+  console.log(analyzerService_ip+" "+sampleFile.name+" "+ taskname);
 
-  sampleFile.mv('/home/shared/'+sampleFile.name, function(err, stdout, stderr) {
+  sampleFile.mv('/home/shared/'+taskname+'.blend', function(err, stdout, stderr) {
     if(err) {
         res.status(400).json({
             error: stderr
         });
     }
     else {
-      folderName = sampleFile.name.slice(0, -6);
 
-      exec("mkdir -p /home/shared/"+folderName+" && date --utc +%FT%T.%3NZ > /home/shared/"+folderName+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+ sampleFile.name+ " ", function(err2, stdout2, stderr2) {
+      exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
             error : stderr2});
@@ -63,6 +64,7 @@ router.post('/upload', function(req, res, next) {
               name: sampleFile.name,
               mimetype: sampleFile.mimetype,
               size: sampleFile.size,
+			  taskName: taskname,
               message: "uploaded"
           });
         }

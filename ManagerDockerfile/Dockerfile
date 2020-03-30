@@ -27,7 +27,7 @@ RUN  curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
 
 
 
-RUN npm install morgan && npm install express && npm install body-parser
+RUN npm install morgan && npm install express && npm install body-parser && npm install uuid
 
 RUN chmod +x /home/P9-reviewRender/ManagerDockerfile/Entrypoint.sh
 
