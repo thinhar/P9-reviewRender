@@ -40,9 +40,9 @@ spec:
         # readinessProbe: # Defines how the load balancer should check if the containers are ready for more traffic
         resources: 
           limits:
-            cpu: 500m
+            cpu: 100m
           requests:
-            cpu: 500m
+            cpu: 100m
 #          exec:
 #            command: # If the file /tmp/ready exists, this succeeds and the container will be marked as not busy
 #            - cat
