@@ -218,7 +218,7 @@ index ec465601541..e8ee78f7db4 100644
      start_resolution = INT_MAX;
      pixel_size = 1;
 diff --git a/intern/cycles/render/tile.cpp b/intern/cycles/render/tile.cpp
-index 9ef0c695667..f3fb17dc4a4 100644
+index 9ef0c695667..a00ee53885f 100644
 --- a/intern/cycles/render/tile.cpp
 +++ b/intern/cycles/render/tile.cpp
 @@ -19,6 +19,7 @@
@@ -229,7 +229,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
  
  CCL_NAMESPACE_BEGIN
  
-@@ -215,6 +216,112 @@ int TileManager::gen_tiles(bool sliced)
+@@ -215,6 +216,111 @@ int TileManager::gen_tiles(bool sliced)
    vector<list<int>>::iterator tile_list;
    tile_list = state.render_tiles.begin();
  
@@ -240,7 +240,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
 +    state.tiles.resize(tile_w * tile_h);
 +
 +    int tiles_per_device = divide_up(tile_w * tile_h, num);
-+    int cur_device = 0, cur_tiles = 1;
++    int cur_device = 0;
 +
 +    int miny = 0;
 +    int i = 1;
@@ -265,7 +265,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
 +                             (p10_tiles_in_frame / total_x_tiles_in_a_row);
 +
 +    while (true) {
-+      int minx = std::floor((i * tile_interval_x * tile_size.x) - tile_size.x);
++      int minx = int(std::floor((i * tile_interval_x * tile_size.x) - tile_size.x));
 +      if (minx + tile_size.x > image_w) {
 +        break;
 +      }
@@ -273,7 +273,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
 +        if (idx > p10_tiles_in_frame) {
 +          break;
 +        }
-+        miny = std::floor((l * tile_interval_y * tile_size.y) - tile_size.y);
++        miny = int(std::floor((l * tile_interval_y * tile_size.y) - tile_size.y));
 +        if (miny + tile_size.y > image_h) {
 +          l = 1;
 +          break;
@@ -286,7 +286,6 @@ index 9ef0c695667..f3fb17dc4a4 100644
 +          idx++;
 +          if (idx + 1 == tiles_per_device) {
 +            tile_list++;
-+            cur_tiles = 0;
 +            cur_device++;
 +          }
 +        }
@@ -295,7 +294,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
 +      i++;
 +      l = 1;
 +    }
-+    return std::ceil(p10_tiles_in_frame);
++    return int(std::ceil(p10_tiles_in_frame));
 +  }
 +
 +  /*while (i <= std::ceil(total_x_tiles_in_frame / tile_interval_x)) {
@@ -342,7 +341,7 @@ index 9ef0c695667..f3fb17dc4a4 100644
    if (tile_order == TILE_HILBERT_SPIRAL) {
      assert(!sliced);
  
-@@ -260,6 +367,7 @@ int TileManager::gen_tiles(bool sliced)
+@@ -260,6 +366,7 @@ int TileManager::gen_tiles(bool sliced)
          /* Only add tiles which are in the image (tiles outside of the image can be generated since
           * the spiral is always square). */
          if (pos.x >= 0 && pos.y >= 0 && pos.x < image_w && pos.y < image_h) {
