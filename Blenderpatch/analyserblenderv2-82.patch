@@ -51,15 +51,16 @@ index 5f163c2510b..3e2e0e7d643 100644
      )
      use_progressive_refine: BoolProperty(
 diff --git a/intern/cycles/blender/blender_sync.cpp b/intern/cycles/blender/blender_sync.cpp
-index 20dbe23cdb7..37eec6f9c34 100644
+index 20dbe23cdb7..067c4e51b39 100644
 --- a/intern/cycles/blender/blender_sync.cpp
 +++ b/intern/cycles/blender/blender_sync.cpp
-@@ -827,7 +827,9 @@ SessionParams BlenderSync::get_session_params(BL::RenderEngine &b_engine,
+@@ -827,7 +827,10 @@ SessionParams BlenderSync::get_session_params(BL::RenderEngine &b_engine,
      params.tile_order = (TileOrder)get_enum(cscene, "tile_order");
    }
    else {
 -    params.tile_order = TILE_BOTTOM_TO_TOP;
-+    params.tile_order = TILE_DISTRIBUTED_SELECTION;
++
++    params.tile_order = (TileOrder)get_enum(cscene, "tile_order");
 +    params.short_circuit_time = get_int(cscene, "short_circuit_time");
 +    params.analyser_percentage = get_float(cscene, "analyser_percentage");
    }
