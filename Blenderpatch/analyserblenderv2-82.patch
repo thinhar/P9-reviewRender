@@ -11,7 +11,7 @@ index b1f351255b7..f0267b6fb74 100644
  # in-source doc-gen
  /doc/doxygen/html/
 diff --git a/intern/cycles/blender/addon/properties.py b/intern/cycles/blender/addon/properties.py
-index 5f163c2510b..5d5b9ad3d6a 100644
+index 5f163c2510b..3e2e0e7d643 100644
 --- a/intern/cycles/blender/addon/properties.py
 +++ b/intern/cycles/blender/addon/properties.py
 @@ -101,6 +101,7 @@ enum_tile_order = (
@@ -36,7 +36,7 @@ index 5f163c2510b..5d5b9ad3d6a 100644
 +        name="Analyser percentage",
 +        description="frame percentage to analyse",
 +        min=0.01, max=1,
-+        default=0.1f,
++        default=0.1,
 +    )
      preview_pause: BoolProperty(
          name="Pause Preview",
