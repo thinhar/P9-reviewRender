@@ -22,9 +22,11 @@ RUN python3 -m pip install pika --upgrade
 
 
 
+# copy blender script
+COPY ./BlenderScript/ /home/BlenderScript
 
-# download and unpack blender
-COPY compiledBlenderFiles/blender /usr/local/blender
+# copy blender
+COPY ./compiledBlenderFiles/blender /usr/local/blender
 
 WORKDIR /home/
 
