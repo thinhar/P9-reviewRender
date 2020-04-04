@@ -1,0 +1,380 @@
+diff --git a/.gitignore b/.gitignore
+index b1f351255b7..f0267b6fb74 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -30,6 +30,7 @@ Desktop.ini
+ # local patches
+ /*.patch
+ /*.diff
++/out/*
+ 
+ # in-source doc-gen
+ /doc/doxygen/html/
+diff --git a/intern/cycles/blender/addon/properties.py b/intern/cycles/blender/addon/properties.py
+index 5f163c2510b..3e2e0e7d643 100644
+--- a/intern/cycles/blender/addon/properties.py
++++ b/intern/cycles/blender/addon/properties.py
+@@ -101,6 +101,7 @@ enum_tile_order = (
+     ('TOP_TO_BOTTOM', "Top to Bottom", "Render from top to bottom"),
+     ('BOTTOM_TO_TOP', "Bottom to Top", "Render from bottom to top"),
+     ('HILBERT_SPIRAL', "Hilbert Spiral", "Render in a Hilbert Spiral"),
++    ('DISTRIBUTED_SELECTION', "Distributed Selection", "Render a distribeted selection of tiles"),
+ )
+ 
+ enum_use_layer_samples = (
+@@ -247,6 +248,18 @@ class CyclesRenderSettings(bpy.types.PropertyGroup):
+         min=0, max=(1 << 24),
+         default=32,
+     )
++    short_circuit_time: IntProperty(
++        name="Short Circuit Time",
++        description="The time before short circuit",
++        min=1, max=(1 << 24),
++        default=10,
++    )
++    analyser_percentage: FloatProperty(
++        name="Analyser percentage",
++        description="frame percentage to analyse",
++        min=0.01, max=1,
++        default=0.1,
++    )
+     preview_pause: BoolProperty(
+         name="Pause Preview",
+         description="Pause all viewport preview renders",
+@@ -613,7 +626,7 @@ class CyclesRenderSettings(bpy.types.PropertyGroup):
+         name="Tile Order",
+         description="Tile order for rendering",
+         items=enum_tile_order,
+-        default='HILBERT_SPIRAL',
++        default='DISTRIBUTED_SELECTION',
+         options=set(),  # Not animatable!
+     )
+     use_progressive_refine: BoolProperty(
+diff --git a/intern/cycles/blender/blender_sync.cpp b/intern/cycles/blender/blender_sync.cpp
+index 20dbe23cdb7..067c4e51b39 100644
+--- a/intern/cycles/blender/blender_sync.cpp
++++ b/intern/cycles/blender/blender_sync.cpp
+@@ -827,7 +827,10 @@ SessionParams BlenderSync::get_session_params(BL::RenderEngine &b_engine,
+     params.tile_order = (TileOrder)get_enum(cscene, "tile_order");
+   }
+   else {
+-    params.tile_order = TILE_BOTTOM_TO_TOP;
++
++    params.tile_order = (TileOrder)get_enum(cscene, "tile_order");
++    params.short_circuit_time = get_int(cscene, "short_circuit_time");
++    params.analyser_percentage = get_float(cscene, "analyser_percentage");
+   }
+ 
+   /* other parameters */
+diff --git a/intern/cycles/device/device_cpu.cpp b/intern/cycles/device/device_cpu.cpp
+index c2843a61e6d..2e66cdb870d 100644
+--- a/intern/cycles/device/device_cpu.cpp
++++ b/intern/cycles/device/device_cpu.cpp
+@@ -16,6 +16,8 @@
+ 
+ #include <stdlib.h>
+ #include <string.h>
++#include <iostream>
++#include <fstream>
+ 
+ /* So ImathMath is included before our kernel_cpu_compat. */
+ #ifdef WITH_OSL
+@@ -836,7 +838,8 @@ class CPUDevice : public Device {
+ 
+     /* Needed for Embree. */
+     SIMD_SET_FLUSH_TO_ZERO;
+-
++    double difference;
++    std::ofstream updateFile;
+     for (int sample = start_sample; sample < end_sample; sample++) {
+       if (task.get_cancel() || task_pool.canceled()) {
+         if (task.need_finish_queue == false)
+@@ -855,6 +858,19 @@ class CPUDevice : public Device {
+       tile.sample = sample + 1;
+ 
+       task.update_progress(&tile, tile.w * tile.h);
++
++      difference = time_dt() - tile.start_time;
++
++      if (difference >= tile.short_circuit_time) {
++        end_sample = 0;
++
++        updateFile.open("sample_output.txt", std::ios_base::app);
++        updateFile << tile.sample;
++        updateFile << ",";
++        updateFile << difference;
++        updateFile <<";";
++        updateFile.close();
++      }
+     }
+     if (use_coverage) {
+       coverage.finalize();
+diff --git a/intern/cycles/render/buffers.cpp b/intern/cycles/render/buffers.cpp
+index b08b6c84c1d..302c86c2318 100644
+--- a/intern/cycles/render/buffers.cpp
++++ b/intern/cycles/render/buffers.cpp
+@@ -125,6 +125,7 @@ RenderTile::RenderTile()
+   buffer = 0;
+ 
+   buffers = NULL;
++  start_time = time_dt();
+ }
+ 
+ /* Render Buffers */
+@@ -140,12 +141,10 @@ RenderBuffers::~RenderBuffers()
+ {
+   buffer.free();
+ }
+-
+ void RenderBuffers::reset(BufferParams &params_)
+ {
+   params = params_;
+-
+-  /* re-allocate buffer */
++  params.parentrtile->start_time = time_dt();
+   buffer.alloc(params.width * params.height * params.get_passes_size());
+   buffer.zero_to_device();
+ }
+diff --git a/intern/cycles/render/buffers.h b/intern/cycles/render/buffers.h
+index 1042b42810f..551a2c0ec44 100644
+--- a/intern/cycles/render/buffers.h
++++ b/intern/cycles/render/buffers.h
+@@ -31,6 +31,7 @@
+ CCL_NAMESPACE_BEGIN
+ 
+ class Device;
++class RenderTile;
+ struct DeviceDrawParams;
+ struct float4;
+ 
+@@ -49,6 +50,7 @@ class BufferParams {
+   int full_width;
+   int full_height;
+ 
++  RenderTile* parentrtile;
+   /* passes */
+   vector<Pass> passes;
+   bool denoising_data_pass;
+@@ -147,7 +149,9 @@ class RenderTile {
+ 
+   RenderBuffers *buffers;
+ 
++  double start_time;
+   RenderTile();
++  int short_circuit_time;
+ };
+ 
+ CCL_NAMESPACE_END
+diff --git a/intern/cycles/render/session.cpp b/intern/cycles/render/session.cpp
+index c77a20787f5..025cef1e97e 100644
+--- a/intern/cycles/render/session.cpp
++++ b/intern/cycles/render/session.cpp
+@@ -400,7 +400,7 @@ bool Session::acquire_tile(Device *tile_device, RenderTile &rtile)
+   rtile.resolution = tile_manager.state.resolution_divider;
+   rtile.tile_index = tile->index;
+   rtile.task = (tile->state == Tile::DENOISE) ? RenderTile::DENOISE : RenderTile::PATH_TRACE;
+-
++  rtile.short_circuit_time = params.short_circuit_time;
+   tile_lock.unlock();
+ 
+   /* in case of a permanent buffer, return it, otherwise we will allocate
+@@ -423,7 +423,7 @@ bool Session::acquire_tile(Device *tile_device, RenderTile &rtile)
+     buffer_params.full_y = rtile.y;
+     buffer_params.width = rtile.w;
+     buffer_params.height = rtile.h;
+-
++    buffer_params.parentrtile = &rtile;
+     /* allocate buffers */
+     tile->buffers = new RenderBuffers(tile_device);
+     tile->buffers->reset(buffer_params);
+@@ -775,7 +775,7 @@ void Session::run()
+   if (params.use_profiling && (params.device.type == DEVICE_CPU)) {
+     profiler.start();
+   }
+-
++  tile_manager.analyser_percentage = params.analyser_percentage;
+   /* session thread loop */
+   progress.set_status("Waiting for render to start");
+ 
+diff --git a/intern/cycles/render/session.h b/intern/cycles/render/session.h
+index ec465601541..e8ee78f7db4 100644
+--- a/intern/cycles/render/session.h
++++ b/intern/cycles/render/session.h
+@@ -50,6 +50,8 @@ class SessionParams {
+   bool progressive;
+   bool experimental;
+   int samples;
++  int short_circuit_time;
++  float analyser_percentage;
+   int2 tile_size;
+   TileOrder tile_order;
+   int start_resolution;
+@@ -83,6 +85,8 @@ class SessionParams {
+     progressive = false;
+     experimental = false;
+     samples = 1024;
++    short_circuit_time = 10;
++    analyser_percentage =0.1f;
+     tile_size = make_int2(64, 64);
+     start_resolution = INT_MAX;
+     pixel_size = 1;
+diff --git a/intern/cycles/render/tile.cpp b/intern/cycles/render/tile.cpp
+index 9ef0c695667..a00ee53885f 100644
+--- a/intern/cycles/render/tile.cpp
++++ b/intern/cycles/render/tile.cpp
+@@ -19,6 +19,7 @@
+ #include "util/util_algorithm.h"
+ #include "util/util_foreach.h"
+ #include "util/util_types.h"
++#include <math.h>
+ 
+ CCL_NAMESPACE_BEGIN
+ 
+@@ -215,6 +216,111 @@ int TileManager::gen_tiles(bool sliced)
+   vector<list<int>>::iterator tile_list;
+   tile_list = state.render_tiles.begin();
+ 
++  if (tile_order == TILE_DISTRIBUTED_SELECTION) {
++    assert(!sliced);
++    int idx = 0;
++    int tile_h = (tile_size.y >= image_h) ? 1 : divide_up(image_h, tile_size.y);
++    state.tiles.resize(tile_w * tile_h);
++
++    int tiles_per_device = divide_up(tile_w * tile_h, num);
++    int cur_device = 0;
++
++    int miny = 0;
++    int i = 1;
++    int l = 1;
++
++    int total_x_tiles_in_frame = (image_w - tile_size.x) / tile_size.x;
++    int total_y_tiles_in_frame = (image_h - tile_size.y) / tile_size.y;
++
++    int a_total_x_tiles_in_frame = (image_w) / tile_size.x;
++    int a_total_y_tiles_in_frame = (image_h) / tile_size.y;
++
++    int total_tiles_in_frame = total_x_tiles_in_frame * total_y_tiles_in_frame;
++    int a_total_tiles_in_frame = a_total_x_tiles_in_frame * a_total_y_tiles_in_frame;
++    double p10_tiles_in_frame = a_total_tiles_in_frame * this->analyser_percentage;
++
++    // find tile interval for x and y axis
++    double total_x_tiles_in_a_row = sqrt(p10_tiles_in_frame * total_x_tiles_in_frame /
++                                         total_y_tiles_in_frame);
++
++    double tile_interval_x = total_x_tiles_in_frame / total_x_tiles_in_a_row;
++    double tile_interval_y = total_y_tiles_in_frame /
++                             (p10_tiles_in_frame / total_x_tiles_in_a_row);
++
++    while (true) {
++      int minx = int(std::floor((i * tile_interval_x * tile_size.x) - tile_size.x));
++      if (minx + tile_size.x > image_w) {
++        break;
++      }
++      while (true) {
++        if (idx > p10_tiles_in_frame) {
++          break;
++        }
++        miny = int(std::floor((l * tile_interval_y * tile_size.y) - tile_size.y));
++        if (miny + tile_size.y > image_h) {
++          l = 1;
++          break;
++        }
++        else {
++          state.tiles[idx] = Tile(
++              idx, minx, miny, tile_size.x, tile_size.y, cur_device, Tile::RENDER);
++          tile_list->push_back(idx);
++
++          idx++;
++          if (idx + 1 == tiles_per_device) {
++            tile_list++;
++            cur_device++;
++          }
++        }
++        l++;
++      }
++      i++;
++      l = 1;
++    }
++    return int(std::ceil(p10_tiles_in_frame));
++  }
++
++  /*while (i <= std::ceil(total_x_tiles_in_frame / tile_interval_x)) {
++    int minx = std::floor((i * tile_interval_x * tile_size.x) - tile_size.x);
++    double maxx = (i * tile_interval_x * tile_size.x) / image_w;
++    if (maxx > 1) {
++      break;
++    }
++
++    while (l <= std::ceil(total_y_tiles_in_frame / tile_interval_y)) {
++
++      if (cur_tiles > p10_tiles_in_frame) {
++        break;
++      }
++
++      miny = std::floor((l * tile_interval_y * tile_size.y) - tile_size.y);
++      maxy = (l * tile_interval_y * tile_size.y) / image_h;
++
++      if (maxy > 1) {
++        l = 1;
++        break;
++      }
++      else {
++        int w = min(tile_size.x, image_w - minx);
++        int h = min(tile_size.y, image_h - miny);
++        state.tiles[idx] = Tile(idx, minx, miny, w, h, cur_device, Tile::RENDER);
++        tile_list->push_back(idx);
++        cur_tiles++;
++        idx++;
++        if (cur_tiles == tiles_per_device) {
++          tile_list++;
++          cur_tiles = 0;
++          cur_device++;
++        }
++      }
++      l++;
++    }
++    i++;
++    l=1;
++  }
++  return std::ceil(p10_tiles_in_frame);
++}*/
++  //________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+   if (tile_order == TILE_HILBERT_SPIRAL) {
+     assert(!sliced);
+ 
+@@ -260,6 +366,7 @@ int TileManager::gen_tiles(bool sliced)
+         /* Only add tiles which are in the image (tiles outside of the image can be generated since
+          * the spiral is always square). */
+         if (pos.x >= 0 && pos.y >= 0 && pos.x < image_w && pos.y < image_h) {
++          // int hello = std::ceil(1.2);
+           int w = min(tile_size.x, image_w - pos.x);
+           int h = min(tile_size.y, image_h - pos.y);
+           int2 ipos = pos / tile_size;
+diff --git a/intern/cycles/render/tile.h b/intern/cycles/render/tile.h
+index 017c1af0ead..efccd7ca0ad 100644
+--- a/intern/cycles/render/tile.h
++++ b/intern/cycles/render/tile.h
+@@ -60,6 +60,7 @@ enum TileOrder {
+   TILE_TOP_TO_BOTTOM = 3,
+   TILE_BOTTOM_TO_TOP = 4,
+   TILE_HILBERT_SPIRAL = 5,
++  TILE_DISTRIBUTED_SELECTION = 6,
+ };
+ 
+ /* Tile Manager */
+@@ -81,13 +82,14 @@ class TileManager {
+      * but can be higher due to the initial resolution division for previews. */
+     uint64_t total_pixel_samples;
+ 
++
+     /* These lists contain the indices of the tiles to be rendered/denoised and are used
+      * when acquiring a new tile for the device.
+      * Each list in each vector is for one logical device. */
+     vector<list<int>> render_tiles;
+     vector<list<int>> denoising_tiles;
+   } state;
+-
++  float analyser_percentage;
+   int num_samples;
+ 
+   TileManager(bool progressive,

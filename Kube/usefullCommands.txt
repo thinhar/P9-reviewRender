@@ -26,7 +26,7 @@ to be run when task is created (multiple times)
 /usr/bin/amqp-publish --url=$BROKER_URL -r foo -p -b Hello
 /usr/bin/amqp-consume --url=$BROKER_URL -q foo -c 1
 
-
+ git diff v2.82 > ../P9-reviewRender/Blenderpatch/analyserblenderv2-82.patch
 
 create pod:
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
