@@ -24,7 +24,7 @@ RUN python3 -m pip install pika --upgrade
 
 
 # download and unpack blender
-COPY ../../build_linux_full /usr/local/blender
+COPY compiledBlenderFiles/blender /usr/local/blender
 
 WORKDIR /home/
 
