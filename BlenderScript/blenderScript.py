@@ -1,4 +1,5 @@
 import os
+import sys
 import bpy
 
 #Base Settings
@@ -53,10 +54,11 @@ start_frame = scene.frame_start
 frames_in_scene = scene.frame_end - scene.frame_start
 animation_framerate = scene.render.fps
 
+task_id = sys.argv[6]
 
 str_output = str(frame_resolution_x) + ";" + str(frame_resolution_y) + ";" + str(start_frame) + ";" + str(frames_in_scene) + ";" + str(animation_framerate) + ";" + str(aprox_frame_render_time)
 
-f = open(bpy.path.abspath("//output.txt"), "w")
+f = open(bpy.path.abspath("//" + task_id + "/output.txt"), "w")
 f.write(str_output)
 f.close()
 
