@@ -36,7 +36,7 @@ RUN chmod +x /home/script/renderscript.sh
 
 
 
-CMD /home/script/renderscript.sh
+CMD /home/script/startpythonrender.sh
 
 
 
