@@ -8,7 +8,7 @@ do
 status=$?
 done
 
-while [$status -gt -10000]
+while [ 900000  -gt $status ]
 do 
 /usr/local/blender/blender -b /home/shared/$QUEUE.blend --python /home/script/pythonRender.py
 status=$?
