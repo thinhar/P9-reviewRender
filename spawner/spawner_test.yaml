@@ -14,6 +14,6 @@ spec:
     - name: QUEUE
       value: taskQueue
     - name: WORKERIMAGE
-      value: thinhar/blenderworker:1.63
+      value: thinhar/blenderworker:1.64
   serviceAccount: pod-creation-sa
   serviceAccountName: pod-creation-sa
