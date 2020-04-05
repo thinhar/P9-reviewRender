@@ -1,7 +1,10 @@
-#!/usr/bin/env python                                                                                                  
+#!/usr/bin/env python3                                                                                                  
  
 import pika
 import os
+import bpy
+
+
 
 parameters = pika.URLParameters(os.environ['BROKER_URL'])
 connection = pika.BlockingConnection(parameters)
@@ -59,7 +62,7 @@ Queue=os.environ['QUEUE']
 #channel.start_consuming()
 #--------------------------------------------------------------testing stuff---------------------------------------------------------
 #scene.render.use_overwrite = True
-scene.render.filepath = '//frame_#####'
+bpy.context.scene.render.filepath = '//frame_#####'
 message = channel.basic_get(Queue, True)
 
 while str(message[0]) != "none":
