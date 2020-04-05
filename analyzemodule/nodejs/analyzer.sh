@@ -45,7 +45,7 @@ numberOfPodsRequired=1
 image=$TASKMANAGERIMAGE
 
 
-/usr/local/blender/blender -b /home/shared/$task_id --python /home/nodejs/analyzer.sh -- ${task_id}
+/usr/local/blender/blender -b /home/shared/$task_id --python /home/BlenderScript/blenderScript.py -- ${task_id} >>/home/enqueueStdout
 
 IFS=';' read -ra ADDR <<< $(</home/shared/${task_id}/output.txt)
 
