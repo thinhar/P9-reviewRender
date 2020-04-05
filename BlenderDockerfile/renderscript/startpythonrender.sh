@@ -7,5 +7,5 @@ do
 /usr/local/blender/blender -b -noaudio /home/shared/$QUEUE.blend --python /home/nodejs/pythonRender.py
 status=$?
 done
-
+read -p " get user input" name
 exit $status
