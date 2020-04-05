@@ -7,5 +7,10 @@ do
 /usr/local/blender/blender -b /home/shared/$QUEUE.blend --python /home/script/pythonRender.py
 status=$?
 done
-read -p " get user input" name
+
+while [$status -gt -10000]
+do 
+/usr/local/blender/blender -b /home/shared/$QUEUE.blend --python /home/script/pythonRender.py
+status=$?
+done
 exit $status
