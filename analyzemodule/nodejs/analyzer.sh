@@ -37,7 +37,7 @@ fi
 
 # REM Read from file, produced by analyser script
 
-numberOfPodsRequired=1
+render_workers_required=1
 
 #resourceRequirements=$(</home/shared/$(podname)/somefile)
 
@@ -58,7 +58,78 @@ framerate = ADDR[4]
 aprox_frame_render_time = ADDR[5]
 
 
+### Functions
+ScaleClusterHorizontal()
+{
+    #Fancy Scaling gl, poopguy
+}
 
+
+
+
+# Math Section
+### x = (FrameEstimateSec / vCPUanalyser) / (1/FPS) 
+requested_framerate = 0.02
+
+required_vCPU = (aprox_frame_render_time / 0.1) / (1 / requested_framerate) 
+available_vCPU_on_node[] = kubectl describe nodes | grep -A 2 -e "^\s*CPU Requests"
+SUM_available_vCPU=$(IFS=+; echo "$((${available_vCPU_on_node[*]}))")
+
+render_workers_vCPU = 1 # UNSURE: do we need to declare it, before use?
+
+# Check if cluster requires scaling
+if [ required_vCPU > SUM_available_vCPU ]
+then
+    cluster_missing_vCPU = required_vCPU - SUM_available_vCPU
+    ScaleClusterHorizontal cluster_missing_vCPU
+fi
+
+
+# Check case to determine $render_workers_required
+if [ requested_framerate < 1 ]
+then
+    render_workers_required = 1 # requested_framerate * (1/requested_framerate)
+    render_workers_vCPU = required_vCPU
+else
+   render_workers_required = math.Round(requested_framerate)
+   render_workers_vCPU = vCPU / render_workers_required
+fi
+
+
+
+
+AddRenderWorkersToQueue render_workers_required
+
+AddRenderWorkersToQueue()
+{
+    available_render_worker_hosts_spots = 0
+
+    for i in nodes
+    do
+        NUMBER = Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU
+        x = python -c "from math import floor; print floor($NUMBER)"
+        x = x + available_render_worker_hosts_spots
+
+        #available_render_worker_hosts_spots += (int)math.Floor(Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU)
+    done
+
+
+    if [required_vCPU > Node_vCPU_Capacity] || [ $1 > available_render_worker_hosts_spots ]
+    then
+        if [ $1 > frames_in_scene ] || [ $1 > 99999 ]  #TODO: use mem_peak or mem_avg to calulate max number of worker pods
+        then
+            sa
+        else
+            # Make sub-tasks with sub-frames ( render_workers_required * 2)
+            # TODO: Add sub-frames logic here
+            AddRenderWorkersToQueue ($1 * 2)
+        fi
+    else
+        # enqueue task to tasklist
+        resourceRequirements = required_vCPU / $1
+        $(python3 ./nodejs/enqueueTaskToTaskQueue.py $podname $1 $resourceRequirements >> /home/enqueueStdout)
+    fi
+}
 
 
 
@@ -83,13 +154,13 @@ $(curl -k POST -H "Authorization: Bearer $KUBE_TOKEN" -H "Content-Type: applicat
 
 
 echo ${podname} >>/home/enqueueStdout
-echo ${numberOfPodsRequired} >>/home/enqueueStdout
+echo ${render_workers_required} >>/home/enqueueStdout
 echo ${resourceRequirements} >>/home/enqueueStdout
 
 
 
 # enqueue task to tasklist
-$(python3 ./nodejs/enqueueTaskToTaskQueue.py $podname $numberOfPodsRequired $resourceRequirements >> /home/enqueueStdout)
+#$(python3 ./nodejs/enqueueTaskToTaskQueue.py $podname $render_workers_required $resourceRequirements >> /home/enqueueStdout)
 
 #entrypoint for taskmanager is adding the frames to frameQueue
 #$(curl -k -X POST -d @- -H "Authorization: Bearer $KUBE_TOKEN" -H 'Accept: application/json' -H 'Content-Type: application/json' https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/pods <<'EOF'{  "kind": "Pod",  "apiVersion": "v1",  ...}EOF)
