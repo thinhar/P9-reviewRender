@@ -21,18 +21,18 @@ image=$TASKMANAGERIMAGE
 
 IFS=';' read -ra ADDR <<< $(</home/shared/${task_id}/output.txt)
 
-frame_resolution_x = ADDR[0] 
-frame_resolution_y = ADDR[1]
-resolution = "${frame_resolution_x}x${frame_resolution_y}"
-startframe = ADDR[2]
-frames_in_scene = ADDR[3]
-framerate = ADDR[4]
-aprox_frame_render_time = ADDR[5]
+frame_resolution_x=${ADDR[0]} 
+frame_resolution_y=${ADDR[1]}
+resolution="${frame_resolution_x}x${frame_resolution_y}"
+startframe=${ADDR[2]}
+frames_in_scene=${ADDR[3]}
+framerate=${ADDR[4]}
+aprox_frame_render_time=${ADDR[5]}
 
 
 
-requested_framerate = $2 
-analyser_vCPU = $ANALYSER_CPU_RESOURCES
+requested_framerate=$2 
+analyser_vCPU=$ANALYSER_CPU_RESOURCES
 
 python3 ./nodejs/python_analysis.py $task_id $frames_in_scene $requested_framerate $aprox_frame_render_time $analyser_vCPU
 
