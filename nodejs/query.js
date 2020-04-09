@@ -56,7 +56,7 @@ router.post('/upload/:REQUESTEDFRAMERATE', function(req, res, next) {
     }
     else {
 
-      exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+$requestedframerate+"/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
+      exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+requestedframerate+"/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
             error : stderr2});
