@@ -23,13 +23,13 @@ router.get('/pig', (req, res, next) => {
 });
 
 
-router.get('/:NAME', (req, res, next) => {
+router.get('/:REQUESTEDFRAMERATE/:NAME', (req, res, next) => {
 
   const taskName = req.params.NAME;
-
+  const requestedframerate = req.params.REQUESTEDFRAMERATE;
   console.log(taskName+" nr2 "+ taskName);
   
-    exec('/home/nodejs/analyzer.sh '+taskName+'', function(err, stdout, stderr) {
+    exec('/home/nodejs/analyzer.sh '+taskName+' '+requestedframerate+'', function(err, stdout, stderr) {
        	if(err) {
           console.log(stderr);
           res.status(400).json({

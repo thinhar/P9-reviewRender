@@ -1,5 +1,6 @@
 #!/bin/bash
 task_id=$1
+
 #some logging for testing
 echo $task_id > /home/enqueueStdout 
 
@@ -30,7 +31,7 @@ aprox_frame_render_time = ADDR[5]
 
 
 
-requested_framerate = 0.02 # TODO: Get this value from ??
+requested_framerate = $2 # TODO: Get this value from ??
 analyser_vCPU = 100 # TODO: Get this value from ??
 
 python3 ./nodejs/python_analysis.py $task_id $frames_in_scene $requested_framerate $aprox_frame_render_time $analyser_vCPU
