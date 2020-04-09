@@ -1,181 +1,119 @@
 #!/usr/bin/env python3
 import os
 import sys
-
-first= sys.argv[1]
-numbertwo= sys.argv[2]
-
-
-# Math Section
-### x = (FrameEstimateSec / vCPUanalyser) / (1/FPS) 
-requested_framerate=0.02
-analyser_vCPU=1000
-aprox_frame_render_time=3000
-
-#required_vCPU = (aprox_frame_render_time / 0.1) / (1 / requested_framerate) 
-required_vCPU = (aprox_frame_render_time/analyser_vCPU)/(1/requested_framerate)
-
-print(required_vCPU)
-print(required_vCPU)
-
-available_vCPU_on_node=[1,2,3,4,5,6,7,8,9,10]
-#kubectl describe nodes | grep -A 2 -e "^\s*CPU Requests"
-SUM_available_vCPU=0
-for i in available_vCPU_on_node:
-    SUM_available_vCPU+=i
-print(SUM_available_vCPU)
-
-SUM_available_vCPU=$(IFS=+; echo "$((${available_vCPU_on_node[*]}))")
-
-render_workers_vCPU=1 # UNSURE: do we need to declare it, before use?
-
-# Check if cluster requires scaling
-logic="print("$required_vCPU">"$SUM_available_vCPU")" | python3
-if [ logic ]
-then
-    cluster_missing_vCPU= echo "print("$required_vCPU"-"$SUM_available_vCPU")" | python3
-    
-    #ScaleClusterHorizontal cluster_missing_vCPU
-fi
-echo $cluster_missing_vCPU
-
-# Check case to determine $render_workers_required
-if [ requested_framerate < 1 ]
-then
-    render_workers_required = 1 # requested_framerate * (1/requested_framerate)
-    render_workers_vCPU = required_vCPU
-else
-   render_workers_required = math.Round(requested_framerate)
-   render_workers_vCPU = vCPU / render_workers_required
-fi
+import requests
+import math
 
 
+# Kubernetes Environment Variables
+kube_service_host = os.environ['KUBERNETES_SERVICE_HOST']
+kube_port = os.environ['KUBERNETES_PORT_443_TCP_PORT']
 
+with open("/var/run/secrets/kubernetes.io/serviceaccount/token", "r") as f:
+    kube_token = f.read()
 
-AddRenderWorkersToQueue render_workers_required
-
-AddRenderWorkersToQueue()
-{
-    available_render_worker_hosts_spots = 0
-
-    for i in nodes
-    do
-        NUMBER = Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU
-        x = python -c "from math import floor; print floor($NUMBER)"
-        x = x + available_render_worker_hosts_spots
-
-        #available_render_worker_hosts_spots += (int)math.Floor(Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU)
-    done
-
-
-    if [required_vCPU > Node_vCPU_Capacity] || [ $1 > available_render_worker_hosts_spots ]
-    then
-        if [ $1 > frames_in_scene ] || [ $1 > 99999 ]  #TODO: use mem_peak or mem_avg to calulate max number of worker pods
-        then
-            sa
-        else
-            # Make sub-tasks with sub-frames ( render_workers_required * 2)
-            # TODO: Add sub-frames logic here
-            AddRenderWorkersToQueue ($1 * 2)
-        fi
-    else
-        # enqueue task to tasklist
-        resourceRequirements = required_vCPU / $1
-        $(python3 ./nodejs/enqueueTaskToTaskQueue.py $podname $1 $resourceRequirements >> /home/enqueueStdout)
-    fi
+headers = {
+    'Authorization': 'Bearer ' + kube_token,
+    'Accept': 'application/json',
 }
 
 
+# Global CONST Variables: do not change in code.
+NODE_MAX_vCPU_CAPACITY = 0
+TASK_ID = sys.argv[1]
+FRAMES_IN_SCENE = int(sys.argv[2])
+REQUESTED_FRAMERATE = float(sys.argv[3])
+APROX_FRAME_RENDER_TIME = float(sys.argv[4])
+ANALYSER_vCPU = int(sys.argv[5])
+REQUIRED_vCPU = APROX_FRAME_RENDER_TIME *  ANALYSER_vCPU * REQUESTED_FRAMERATE # vCPU = FrameEstimateSec * vCPUanalyser * FPS 
 
 
-
-#----------------------------------------------------------#
-#!/usr/bin/env python3
-import os
-import sys
+# Global Variables
+cluster_nodes = []
 
 
-# Math Section
-### x = (FrameEstimateSec / vCPUanalyser) / (1/FPS) 
-requested_framerate=60
-analyser_vCPU=0.1
-aprox_frame_render_time=1 # s/frame
-#requested_framerate = frame/s
+# Classes
+class ClusterNode:
+    name = ""
+    vCPU_capacity = 0
+    occupied_vCPU = 0
+    available_vCPU = 0
 
-#required_vCPU = (aprox_frame_render_time / 0.1) / (1 / requested_framerate) 
-something = (aprox_frame_render_time * analyser_vCPU)
-required_vCPU = aprox_frame_render_time *  analyser_vCPU * requested_framerate
+    def __init__(self, name, vCPU_capacity, currently_used_vCPU): 
+        self.name = name
+        self.vCPU_capacity = vCPU_capacity
+        self.occupied_vCPU = currently_used_vCPU
+        self.available_vCPU = self.vCPU_capacity - self.occupied_vCPU
 
-something2 = (aprox_frame_render_time / analyser_vCPU ) 
+        global NODE_MAX_vCPU_CAPACITY
+        if vCPU_capacity > NODE_MAX_vCPU_CAPACITY:
+            NODE_MAX_vCPU_CAPACITY = vCPU_capacity
+
+        cluster_nodes.append(self)
 
 
+# Functions
+def GetClusterNodes():
+    nodes_response = requests.get("https://" + kube_service_host + ":" + kube_port + "/api/v1/nodes/", headers=headers, verify=False).json()
+    pods_response = requests.get("https://" + kube_service_host + ":" + kube_port + "/api/v1/pods", headers=headers, verify=False).json()
 
-print(required_vCPU)
+    for node in nodes_response["items"]:
+        node_name = node["metadata"]["name"]
+        node_cpu_usage = 0
 
-available_vCPU_on_node=[1,2,3,4,5,6,7,8,9,10]
-#kubectl describe nodes | grep -A 2 -e "^\s*CPU Requests"
-SUM_available_vCPU=0
-for i in available_vCPU_on_node:
-    SUM_available_vCPU+=i
-print(SUM_available_vCPU)
+        for pod in pods_response["items"]:
+            if pod["spec"]["nodeName"] == node_name and pod["status"]["phase"] != "Succeeded" or pod["status"]["phase"] != "Failed":
+                for container in pod["spec"]["containers"]:
+                    if container["resources"]:
+                        node_cpu_usage += int(''.join(c for c in container["resources"]["requests"]["cpu"] if c.isdigit()))
 
-if required_vCPU>SUM_available_vCPU:
-    print("more than available")
-    cluster_missing_vCPU= required_vCPU - SUM_available_vCPU
-    #ScaleClusterHorizontal cluster_missing_vCPU
+        ClusterNode(node_name, int(''.join(c for c in node["status"]["allocatable"]["cpu"] if c.isdigit())), node_cpu_usage)
 
-# Check case to determine $render_workers_required
-if requested_framerate < 1:
-    render_workers_required = 1 # requested_framerate * (1/requested_framerate)
-    render_workers_vCPU = required_vCPU
-else:
-   render_workers_required = round(requested_framerate)
-   render_workers_vCPU = required_vCPU / render_workers_required
-   
-print(render_workers_required)
-print(render_workers_vCPU)
+def ScaleClusterHorizontal(scale_amount):
+    print("STATUS: Cluster has been scaled by: ", scale_amount)
 
-def AddRenderWorkersToQueue():
-    print("hello")
+def AddRenderWorkersToQueue(number_of_workers, render_worker_required_vCPU):
     available_render_worker_hosts_spots = 0
 
-    for i in nodes:
-        NUMBER = Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU
-        x =floor(NUMBER)
-        x = x + available_render_worker_hosts_spots
+    for node in cluster_nodes:
+        available_render_worker_hosts_spots += math.floor(node.available_vCPU / render_worker_required_vCPU)
 
-        #available_render_worker_hosts_spots += (int)math.Floor(Node_List[i].available_vCPU_on_a_single_node / render_workers_vCPU)
-
-
-    if [required_vCPU > Node_vCPU_Capacity] || [ $1 > available_render_worker_hosts_spots ]
-    then
-        if [ $1 > frames_in_scene ] || [ $1 > 99999 ]  #TODO: use mem_peak or mem_avg to calulate max number of worker pods
-        then
-            sa
-        else
-            # Make sub-tasks with sub-frames ( render_workers_required * 2)
-            # TODO: Add sub-frames logic here
-            AddRenderWorkersToQueue ($1 * 2)
-        fi
-    else
-        # enqueue task to tasklist
-        resourceRequirements = required_vCPU / $1
-        $(python3 ./nodejs/enqueueTaskToTaskQueue.py $podname $1 $resourceRequirements >> /home/enqueueStdout)
-    fi
-
-AddRenderWorkersToQueue()
+    if REQUIRED_vCPU > NODE_MAX_vCPU_CAPACITY or number_of_workers > available_render_worker_hosts_spots:
+        if number_of_workers > FRAMES_IN_SCENE or number_of_workers > 99999:  #TODO: use mem_peak or mem_avg to calulate max number of worker pods
+            #TODO: Error handling? something something
+            print("Error: Too many required render workers, to complete the submitted render task.")
+        else:
+            # TODO: Add sub-frames logic here ( render_workers_required * 2)
+            AddRenderWorkersToQueue(number_of_workers * 2, render_worker_required_vCPU)
+    else:
+        resourceRequirements = "C" + str(int(math.ceil(REQUIRED_vCPU / number_of_workers))) 
+        # Enqueue task to TaskQueue
+        os.system("python3 ./nodejs/enqueueTaskToTaskQueue.py " + str(TASK_ID) + " " + str(number_of_workers) + " " + resourceRequirements)
 
 
+# Main
+def main():
+    GetClusterNodes()
+  
+    SUM_available_vCPU = 0
+    for node in cluster_nodes:
+        SUM_available_vCPU += node.available_vCPU
+
+    if REQUIRED_vCPU > SUM_available_vCPU:
+        print("STATUS: vCPU demand is higher than available... Calling ScaleClusterHorizontal")
+        cluster_missing_vCPU = REQUIRED_vCPU - SUM_available_vCPU
+        ScaleClusterHorizontal(cluster_missing_vCPU)
+
+    # Check case to determine $render_workers_required
+    if REQUESTED_FRAMERATE < 1:
+        render_workers_required = 1 # REQUESTED_FRAMERATE * (1 / REQUESTED_FRAMERATE)
+        render_workers_vCPU = REQUIRED_vCPU
+    else:
+        render_workers_required = round(REQUESTED_FRAMERATE)
+        render_workers_vCPU = REQUIRED_vCPU / render_workers_required
+    
+    # Calulate number of render workers required, and add to TaskQueue
+    AddRenderWorkersToQueue(render_workers_required, render_workers_vCPU)
 
 
-
-
-
-
-
-
-
-
-
-
-
+main()
