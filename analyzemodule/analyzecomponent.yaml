@@ -50,6 +50,10 @@ spec:
 #          initialDelaySeconds: 2
 #          periodSeconds: 1
         env: # Environment variables for the session, useful for debugging. Source: https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/
+        - name: ANALYSER_CPU_RESOURCES
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.containers[0].resources.requests.CPU
         - name: BROKER_URL
           value: amqp://guest:guest@rabbitmq-service:5672
         - name: QUEUE
