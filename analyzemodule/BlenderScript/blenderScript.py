@@ -54,7 +54,7 @@ start_frame = scene.frame_start
 frames_in_scene = scene.frame_end - scene.frame_start
 animation_framerate = scene.render.fps
 
-task_id = sys.argv[6]
+task_id = sys.argv[6][:-6] # Removes '.blend' from string, to get correct folder name
 
 str_output = str(frame_resolution_x) + ";" + str(frame_resolution_y) + ";" + str(start_frame) + ";" + str(frames_in_scene) + ";" + str(animation_framerate) + ";" + str(aprox_frame_render_time)
 
