@@ -11,13 +11,13 @@ channel = connection.channel()
 Queue=os.environ['QUEUE']
 
 #scene.render.use_overwrite = True
-bpy.context.scene.render.filepath = '//frame_#####'
+bpy.context.scene.render.filepath = '//'+Queue+'/frame_#####'
 message = channel.basic_get(Queue, True)
 
 while str(message[0]) != "None":
     #render
     bpy.context.scene.frame_current = int(str(message[2]).split('\'')[1])
-    bpy.ops.render.render(animation = False)
+    bpy.ops.render.render(write_still = 1, animation = False)
     message = channel.basic_get(Queue, True)
 
 
