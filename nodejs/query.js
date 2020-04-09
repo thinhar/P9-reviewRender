@@ -34,7 +34,7 @@ router.post('/uploadasync', async (req, res, next) => {
 //exec("/usr/bin/amqp-declare-queue --url=$BROKER_URL -q "+sampleFile.name+" && /usr/bin/amqp-publish --url=$BROKER_URL -r "+sampleFile.name+" -p -b \""+sampleFile.name +" -f 1\"  && /usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
  
 
-router.post('/upload', function(req, res, next) {
+router.post('/upload/:REQUESTEDFRAMERATE', function(req, res, next) {
   //console.log(req.files);
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No file was uploaded.');
@@ -55,7 +55,7 @@ router.post('/upload', function(req, res, next) {
     }
     else {
 
-      exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
+      exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+$REQUESTEDFRAMERATE+"/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
         if (err2){
           return res.status(500).json({
             error : stderr2});
