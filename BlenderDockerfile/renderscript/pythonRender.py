@@ -47,7 +47,7 @@ while str(message[0]) != "None":
 
     channel.basic_publish(
 		exchange='',
-		routing_key=Queue+""+FrameList,
+		routing_key=Queue+"FrameList",
 		body=bpy.context.scene.frame_current,
 		properties=pika.BasicProperties(
 			delivery_mode=2,  # make message persistent
