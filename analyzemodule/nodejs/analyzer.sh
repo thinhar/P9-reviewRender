@@ -19,7 +19,7 @@ image=$TASKMANAGERIMAGE
 
 /usr/local/blender/blender -b /home/shared/$task_id --python /home/BlenderScript/blenderScript.py -- ${task_id} >>/home/enqueueStdout
 
-IFS=';' read -ra ADDR <<< $(</home/shared/${task_id}/output.txt)
+IFS=';' read -ra ADDR <<< $(</home/shared/${podname}/output.txt)
 
 frame_resolution_x=${ADDR[0]} 
 frame_resolution_y=${ADDR[1]}

@@ -7,8 +7,11 @@ kubectl apply -f PATHTOREPOSITORY\P7-DimensionalShopping\Backend\Kubernetes\dime
 az aks delete --resource-group cloudrender-rg --name cloudrender005 --no-wait
 kubectl run -i --tty temp --image thinhar/blenderworker:1.21
 kubectl describe pvc PERSISTANTVOLUMEVCLAIM
+rabbitmqctl list_queues
 
 https://attacomsian.com/blog/uploading-files-nodejs-express
+
+
 
 remember:
 https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
@@ -18,13 +21,6 @@ kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0
 
 
 https://manpages.debian.org/unstable/amqp-tools/index.html
-to be run once at startup
-export BROKER_URL=amqp://guest:guest@rabbitmq-service:5672 //somehow make BROKER_URL an env variable for the workers and the ones who publish tasks 
-/usr/bin/amqp-declare-queue --url=amqp://guest:guest@rabbitmq-service:5672 -q foo3 -d //somehow make NAME an env variable for the workers and the ones who publish tasks 
-
-to be run when task is created (multiple times)
-/usr/bin/amqp-publish --url=$BROKER_URL -r foo -p -b Hello
-/usr/bin/amqp-consume --url=$BROKER_URL -q foo -c 1
 
  git diff v2.82 > ../P9-reviewRender/Blenderpatch/analyserblenderv2-82.patch
 
