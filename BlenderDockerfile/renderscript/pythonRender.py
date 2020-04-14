@@ -48,7 +48,7 @@ while str(message[0]) != "None":
     channel.basic_publish(
 		exchange='',
 		routing_key=Queue+"FrameList",
-		body=bpy.context.scene.frame_current,
+		body=str(bpy.context.scene.frame_current),
 		properties=pika.BasicProperties(
 			delivery_mode=2,  # make message persistent
 			priority=1 #1 is lowers priority
