@@ -48,8 +48,8 @@ samples_pr_sec = averageTilecount * scene.render.threads
 
 # Output variables for the Task Manager
 aprox_frame_render_time = total_samples/samples_pr_sec
-frame_resolution_x = scene.render.tile_x.real
-frame_resolution_y = scene.render.tile_y.real
+frame_resolution_x = scene.render.resolution_x.real
+frame_resolution_y = scene.render.resolution_y.real
 start_frame = scene.frame_start
 frames_in_scene = scene.frame_end - scene.frame_start
 animation_framerate = scene.render.fps
