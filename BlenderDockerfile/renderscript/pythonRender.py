@@ -6,7 +6,7 @@ import os
 import bpy
 import math
 
-parameters = pika.URLParameters(os.environ['BROKER_URL'])
+urlparameters = pika.URLParameters(os.environ['BROKER_URL']+"?heartbeat=0")
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 Queue=os.environ['QUEUE']
@@ -58,3 +58,4 @@ while str(message[0]) != "None":
 
     message = channel.basic_get(Queue, True)
 
+channel.close()
