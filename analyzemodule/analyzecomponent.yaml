@@ -31,7 +31,7 @@ spec:
     spec: # Define the template to build on: useually a docker image
       containers: 
       - name: analyzer-i # Give the container a name
-        image: thinhar/analyzer:0.60 # Which docker image it should be based on
+        image: thinhar/analyzer:0.61 # Which docker image it should be based on
         ports: # Open ports in the containers (this basically just adds an option to the docker run command)
         - containerPort: 80 # Same port as its corresponding load balancer
         # To override the docker entrypoint and keeping the container alive to debug it manually write the commands below:
