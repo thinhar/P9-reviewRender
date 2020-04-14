@@ -18,18 +18,20 @@ do
 framenumber=$(/usr/bin/amqp-consume --url=$BROKER_URL -q $queuename -c 1 cat && echo)
 
 
+echo ${framenumber}
+
 
 
 
 #encode command
-$(ffmpeg -framerate ${FRAMERATE} -start_number ${framenumber} -i /home/shared/${FOLDERNAME}/frame_%04d.png -r 30 -g 90 -s ${RESOLUTION} -quality realtime -speed 5 -threads 2 -row-mt 1 -tile-columns 3 -frame-parallel 0 -b:v 2000k -c:v vp9 -b:a 128k -c:a libopus -f webm "/home/shared/"${FOLDERNAME}"/output"${framenumber}".webm" >>/home/enqueueStdout)
+$(ffmpeg -framerate ${FRAMERATE} -start_number ${framenumber} -i /home/shared/${FOLDERNAME}/frame_%5d.png -r 30 -g 90 -s ${RESOLUTION} -quality realtime -speed 5 -threads 2 -row-mt 1 -tile-columns 3 -frame-parallel 0 -b:v 2000k -c:v vp9 -b:a 128k -c:a libopus -f webm "/home/shared/"${FOLDERNAME}"/output"${framenumber}".webm")
 
 
 
-$(echo "file 'output${framenumber}.webm'">>/home/shared/${FOLDERNAME}/outputfiles.txt >>/home/enqueueStdout)
+$(echo "file 'output${framenumber}.webm'">>/home/shared/${FOLDERNAME}/outputfiles.txt )
 
 
-$(ffmpeg -f concat -i "/home/shared/${FOLDERNAME}/outputfiles.txt" -c copy "/home/shared/${FOLDERNAME}/finaloutput${framenumber}.webm" >>/home/enqueueStdout)
+$(ffmpeg -f concat -i "/home/shared/${FOLDERNAME}/outputfiles.txt" -c copy "/home/shared/${FOLDERNAME}/finaloutput${framenumber}.webm" )
 
 $(printf "finaloutput${framenumber}.webm">/home/shared/${FOLDERNAME}/currentFinalfile)
 
