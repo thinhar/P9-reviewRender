@@ -44,4 +44,17 @@ while str(message[0]) != "None":
     digits_str += str(bpy.context.scene.frame_current)
     bpy.context.scene.render.filepath = "//" + Queue + "/frame_" + digits_str
     bpy.ops.render.render(write_still = 1, animation = False)
+
+    channel.basic_publish(
+		exchange='',
+		routing_key=Queue+""+FrameList,
+		body=bpy.context.scene.frame_current,
+		properties=pika.BasicProperties(
+			delivery_mode=2,  # make message persistent
+			priority=1 #1 is lowers priority
+		)
+	)
+
+
     message = channel.basic_get(Queue, True)
+
