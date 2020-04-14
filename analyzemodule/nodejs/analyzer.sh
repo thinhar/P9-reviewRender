@@ -34,7 +34,7 @@ aprox_frame_render_time=${ADDR[5]}
 requested_framerate=$2 
 analyser_vCPU=$ANALYSER_CPU_RESOURCES
 
-python3 ./nodejs/python_analysis.py $task_id $frames_in_scene $requested_framerate $aprox_frame_render_time $analyser_vCPU
+python3 ./nodejs/python_analysis.py $podname $frames_in_scene $requested_framerate $aprox_frame_render_time $analyser_vCPU >>home/enqueueStdout
 
 
 
