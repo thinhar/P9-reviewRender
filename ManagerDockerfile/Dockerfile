@@ -19,7 +19,7 @@ RUN apt-get update && \
 
 WORKDIR /home/
 # move this shit to a entrypoint so i dont have to remake the image all the time
-RUN git clone "https://github.com/thinhar/P9-reviewRender.git" && cd P9-reviewRender && git checkout manger-Api
+RUN git clone "https://github.com/thinhar/P9-reviewRender.git" && cd P9-reviewRender && git checkout P9API
 
 
 RUN  curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
