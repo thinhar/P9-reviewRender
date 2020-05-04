@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: thinhar/spawner:p9unlimit2
+  - image: thinhar/spawner:p9unlimit3
     name: spawner
     tty: true
     env: 
