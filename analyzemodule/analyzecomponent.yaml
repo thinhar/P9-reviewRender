@@ -31,7 +31,7 @@ spec:
     spec: # Define the template to build on: useually a docker image
       containers: 
       - name: analyzer-i # Give the container a name
-        image: thinhar/analyzer:0.48 # Which docker image it should be based on
+        image: thinhar/analyzer:RRE # Which docker image it should be based on
         ports: # Open ports in the containers (this basically just adds an option to the docker run command)
         - containerPort: 80 # Same port as its corresponding load balancer
         # To override the docker entrypoint and keeping the container alive to debug it manually write the commands below:
@@ -40,9 +40,9 @@ spec:
         # readinessProbe: # Defines how the load balancer should check if the containers are ready for more traffic
         resources: 
           limits:
-            cpu: 500m
+            cpu: 100m
           requests:
-            cpu: 500m
+            cpu: 50m
 #          exec:
 #            command: # If the file /tmp/ready exists, this succeeds and the container will be marked as not busy
 #            - cat

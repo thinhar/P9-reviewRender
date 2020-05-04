@@ -17,15 +17,15 @@ fi
 
 ############################ shitty analysis change duo task
 if [ ! -f /home/somefile ]; then
-     printf "%s" "C1450"> /home/somefile
+     printf "%s" "C1350"> /home/somefile
 fi
 
 resourceRequirements=$(</home/somefile)
-if [[ ${resourceRequirements} == "C1000" ]]
+if [[ ${resourceRequirements} == "C1350" ]]
 then
-        printf "%s" "C1220"> /home/somefile
+        printf "%s" "C1120"> /home/somefile
 else
-        printf "%s" "C1450"> /home/somefile
+        printf "%s" "C1350"> /home/somefile
 fi
 ############################## shitty analysis change duo task
 
