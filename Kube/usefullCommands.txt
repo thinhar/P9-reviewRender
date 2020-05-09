@@ -10,8 +10,12 @@ kubectl describe pvc PERSISTANTVOLUMEVCLAIM
 rabbitmqctl list_queues
 
 https://attacomsian.com/blog/uploading-files-nodejs-express
+kuberntetes API:
+https://docs.openshift.com/container-platform/3.7/rest_api/api/v1.Pod.html
 
 
+kubernetes scale cluster:
+https://docs.microsoft.com/en-us/azure/aks/scale-cluster
 
 remember:
 https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
