@@ -20,13 +20,13 @@ https://docs.microsoft.com/en-us/azure/aks/scale-cluster
 remember:
 https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-register-provider-errors
 az provider register --namespace Microsoft.Storage
-+++++
+Beta GPU stuff
 kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta/nvidia-device-plugin.yml
 
 
 https://manpages.debian.org/unstable/amqp-tools/index.html
 
- git diff v2.82 > ../P9-reviewRender/Blenderpatch/analyserblenderv2-82.patch
+git diff v2.82 > ../P9-reviewRender/Blenderpatch/analyserblenderv2-82.patch
 
 create pod:
 KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
@@ -72,11 +72,6 @@ KUBERNETES_SERVICE_HOST and KUBERNETES_PORT_443_TCP_PORT are prexsisting env var
 
 
 
-figure out who creates:
-tasklist (unnessisarry queue, cant find origin)
-
-
-
 note(pods that are dependent on the queue might be unable to establish a connection initially(when the queue just has started) but will after a restart or a bit of time)
 
 kube yaml file dependencies:
@@ -85,19 +80,11 @@ queue (takes a while to startup and needs to be done starting up to avoid restar
 volume
 worker_creator_role
 
-
-
 dependentcies:
 analyzer (volume worker_creator_role queue)
 frontend (volume analyzer)
-streamAccesApipod (volume )
 spawner(worker_creator_role + inherits dependencies from children: volume queue)
 
 (spawned by analyzer and spawner)
 taskmanager (queue) ( analyzer )
 backend (volume queue) (spawner)
-
-
-24 frame
-2 pods
-CPU requirement 1000m
