@@ -50,4 +50,5 @@ $(printf "%s" "{\"apiVersion\": \"v1\",\"kind\": \"Pod\",\"metadata\": { \"name\
 $(curl -k POST -H "Authorization: Bearer $KUBE_TOKEN" -H "Content-Type: application/json" https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT/api/v1/namespaces/default/pods -d@scriptprintf >>/home/enqueueStdout)
 
 
-echo ${podname} "analyser output:" ${aprox_frame_render_time} >>/home/enqueueStdout
+echo ${podname} "analyser output:" ${aprox_frame_render_time} >>/home/analyserinformation
+date --utc +%FT%T.%3NZ >> /home/shared/"${podname}"/timestamps
