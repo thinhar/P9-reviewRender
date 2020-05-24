@@ -62,11 +62,10 @@ def GetClusterNodes():
         node_cpu_usage = 0
 
         for pod in pods_response["items"]:
-            if pod["spec"]["nodeName"] == node_name and pod["status"]["phase"] != "Succeeded" or pod["status"]["phase"] != "Failed":
+            if pod["spec"]["nodeName"] == node_name and pod["status"]["phase"] != "Succeeded" and pod["status"]["phase"] != "Failed":
                 for container in pod["spec"]["containers"]:
                     if container["resources"]:
                         node_cpu_usage += int(''.join(c for c in container["resources"]["requests"]["cpu"] if c.isdigit()))
-
         ClusterNode(node_name, int(''.join(c for c in node["status"]["allocatable"]["cpu"] if c.isdigit())), node_cpu_usage)
 
 def ScaleClusterHorizontal(scale_amount):
@@ -76,15 +75,17 @@ def AddRenderWorkersToQueue(number_of_workers, render_worker_required_vCPU):
     available_render_worker_hosts_spots = 0
 
     for node in cluster_nodes:
+
         available_render_worker_hosts_spots += math.floor(node.available_vCPU / render_worker_required_vCPU)
 
     if REQUIRED_vCPU > NODE_MAX_vCPU_CAPACITY or number_of_workers > available_render_worker_hosts_spots:
         if number_of_workers > FRAMES_IN_SCENE or number_of_workers > 99999:  #TODO: use mem_peak or mem_avg to calulate max number of worker pods
             #TODO: Error handling? something something
+            print( REQUIRED_vCPU, NODE_MAX_vCPU_CAPACITY, number_of_workers, available_render_worker_hosts_spots, FRAMES_IN_SCENE)
             print("Error: Too many required render workers, to complete the submitted render task.")
         else:
             # TODO: Add sub-frames logic here ( render_workers_required * 2)
-            AddRenderWorkersToQueue(number_of_workers * 2, render_worker_required_vCPU)
+            AddRenderWorkersToQueue(number_of_workers * 2, render_worker_required_vCPU/2)
     else:
         resourceRequirements = "C" + str(int(math.ceil(REQUIRED_vCPU / number_of_workers))) 
         # Enqueue task to TaskQueue
