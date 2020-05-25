@@ -1,6 +1,33 @@
 import os
 import sys
 import bpy
+from bpy.app import handlers
+import time
+from decimal import Decimal
+
+RENDER_START_TIME = 0.0
+TOTAL_TIME_Analyse = Decimal(0.0)
+
+def render_pre(scene):
+    global RENDER_START_TIME
+    RENDER_START_TIME = time.time()
+
+def render_post(scene):
+    elapsed_time = (time.time() - RENDER_START_TIME)
+
+    global TOTAL_TIME_Analyse
+    TOTAL_TIME_Analyse += Decimal(elapsed_time)
+
+frame_handlers = [getattr(handlers, name)
+        for name in dir(handlers) if name.startswith("render_")]
+
+def clear_handlers():
+    for  handler in frame_handlers:
+        handler.clear()
+
+clear_handlers()
+handlers.render_pre.append(render_pre)
+handlers.render_post.append(render_post)
 
 #Base Settings
 scene = bpy.context.scene
@@ -12,7 +39,7 @@ scene.render.tile_y = 64
 scene.frame_step = 10
 user_render_task_samples = scene.cycles.samples # samples in the actual task from the user.
 scene.cycles.short_circuit_time = 1
-scene.cycles.analyser_percentage = 0.03
+scene.cycles.analyser_percentage = 0.05
 scene.cycles.samples = 1000000
 
 #Output Settings
@@ -37,6 +64,9 @@ with open("sample_output.txt","r") as f:
 
 os.remove("sample_output.txt")
 
+preparation_TIME = TOTAL_TIME_Analyse - Decimal(render_time_sum/scene.render.threads)
+print("Preparation Time:", preparation_TIME)
+
 averageTilecount=sample_count_sum/render_time_sum
 
 total_x_tiles_in_frame = scene.render.resolution_x.real / scene.render.tile_x.real
@@ -47,7 +77,10 @@ total_samples = (user_render_task_samples*total_tiles_in_frame)
 samples_pr_sec = averageTilecount * scene.render.threads
 
 # Output variables for the Task Manager
-aprox_frame_render_time = total_samples/samples_pr_sec
+aprox_frame_render_time = total_samples / samples_pr_sec
+if preparation_TIME > 0:
+    aprox_frame_render_time = Decimal(aprox_frame_render_time) + preparation_TIME
+
 frame_resolution_x = scene.render.resolution_x.real
 frame_resolution_y = scene.render.resolution_y.real
 start_frame = scene.frame_start
