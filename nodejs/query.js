@@ -32,7 +32,7 @@ var exec = require('child_process').exec,child;
 // });
 
 //exec("/usr/bin/amqp-declare-queue --url=$BROKER_URL -q "+sampleFile.name+" && /usr/bin/amqp-publish --url=$BROKER_URL -r "+sampleFile.name+" -p -b \""+sampleFile.name +" -f 1\"  && /usr/bin/amqp-publish --url=$BROKER_URL -r $QUEUE -p -b "+sampleFile.name, function(err, stdout, stderr) {
-  router.post('/uploadasync/:REQUESTEDFRAMERATE', async(req, res, next) {
+  router.post('/uploadasync/:REQUESTEDFRAMERATE', async (req, res, next) => {
     //console.log(req.files);
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send('No file was uploaded.');
