@@ -51,23 +51,18 @@ var exec = require('child_process').exec,child;
           res.status(400).json({
               error: stderr
           });
-      }
-      else {
+      }else { 
   
         exec("mkdir -p /home/shared/"+taskname+" && date --utc +%FT%T.%3NZ > /home/shared/"+taskname+"/timestamps && curl --request GET "+analyzerService_ip+":80/query/"+requestedframerate+"/"+ taskname+ ".blend ", function(err2, stdout2, stderr2) {
-          if (err2){
-            return res.status(500).json({
-              error : stderr2});
-          }else { 
-            res.status(200).json({
-                name: sampleFile.name,
-                mimetype: sampleFile.mimetype,
-                size: sampleFile.size,
-          taskName: taskname,
-                message: "uploaded"
-            });
-          }
+
         });
+        res.status(200).json({
+          name: sampleFile.name,
+          mimetype: sampleFile.mimetype,
+          size: sampleFile.size,
+          taskName: taskname,
+          message: "uploaded"
+      });
       }
     });
   
