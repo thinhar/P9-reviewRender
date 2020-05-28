@@ -84,7 +84,7 @@ if preparation_TIME > 0:
 frame_resolution_x = scene.render.resolution_x.real
 frame_resolution_y = scene.render.resolution_y.real
 start_frame = scene.frame_start
-frames_in_scene = scene.frame_end - scene.frame_start
+frames_in_scene = (scene.frame_end +1) - scene.frame_start
 animation_framerate = scene.render.fps
 
 task_id = sys.argv[6][:-6] # Removes '.blend' from string, to get correct folder name
