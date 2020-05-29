@@ -38,8 +38,8 @@ scene.render.tile_x = 64
 scene.render.tile_y = 64
 scene.frame_step = 10
 user_render_task_samples = scene.cycles.samples # samples in the actual task from the user.
-scene.cycles.short_circuit_time = 1
-scene.cycles.analyser_percentage = 0.05
+scene.cycles.short_circuit_time = int(os.environ['SHORT_CIRCUIT_TIME'])
+scene.cycles.analyser_percentage = Decimal(os.environ['ANALYSER_PERCENTAGE'])
 scene.cycles.samples = 1000000
 
 #Output Settings
@@ -63,6 +63,7 @@ with open("sample_output.txt","r") as f:
             render_time_sum += float(item[1])
 
 os.remove("sample_output.txt")
+
 
 preparation_TIME = TOTAL_TIME_Analyse - Decimal(render_time_sum/scene.render.threads)
 print("Preparation Time:", preparation_TIME)
